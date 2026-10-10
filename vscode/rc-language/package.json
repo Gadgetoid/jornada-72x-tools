@@ -1,0 +1,50 @@
+{
+    "name": "rc-language",
+    "displayName": "Resource Script (RC)",
+    "description": "Syntax highlighting for Windows resource scripts (.rc)",
+    "version": "0.1.0",
+    "publisher": "jornada-72x-tools",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Gadgetoid/jornada-72x-tools.git",
+        "directory": "vscode/rc-language"
+    },
+    "engines": {
+        "vscode": "^1.60.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "rc",
+                "aliases": [
+                    "Resource Script",
+                    "RC"
+                ],
+                "extensions": [
+                    ".rc",
+                    ".rc2"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "rc",
+                "scopeName": "source.rc",
+                "path": "./syntaxes/rc.tmLanguage.json"
+            }
+        ]
+    },
+    "scripts": {
+        "test": "vscode-tmgrammar-test test/*.test.rc && node test/check-files.js"
+    },
+    "devDependencies": {
+        "vscode-oniguruma": "^2.0.1",
+        "vscode-textmate": "^9.3.2",
+        "vscode-tmgrammar-test": "^0.1.3"
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "ce3-debug",
+            "displayName": "CE 3.0 Debug",
+            "binaryDir": "${sourceParentDir}/build/debug-ce3",
+            "toolchainFile": "${sourceParentDir}/cmake/jornada-ce.cmake",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "ce3-debug",
+            "configurePreset": "ce3-debug"
+        }
+    ]
+}

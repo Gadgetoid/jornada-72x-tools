@@ -1,0 +1,101 @@
+## ExtractIconExW(lpszExeFileName, nIconIndex, phiconLarge, phiconSmall, nIcons)
+Extracts an icon from an executable, DLL or icon file.
+
+Free the icons with DestroyIcon.
+
+@param lpszExeFileName Path of the file.
+@param nIconIndex 0 for the first icon, or -N for the icon with
+       resource ID N. Other indexes are not supported.
+@param phiconLarge Receives the large icon, or NULL.
+@param phiconSmall Receives the small icon, or NULL.
+@param nIcons Must be 1.
+@return Nonzero on success, 0 on failure.
+
+## SHCreateShortcut(szShortcut, szTarget)
+Creates a shortcut file pointing at a target path.
+
+@param szShortcut Path of the shortcut to create. Must not be NULL.
+@param szTarget Target path, up to 256 characters.
+@return TRUE on success, FALSE on failure.
+
+## ShellExecuteEx(lpExecInfo)
+Performs an action on a file, such as launching an application or document.
+
+On success, hInstApp receives the started application's instance
+handle. On failure, it contains a compatibility SE_ERR_* value; use
+GetLastError for the error code.
+
+@param lpExecInfo Input settings and output information for the action.
+@return Nonzero on success, zero on failure.
+
+## SHFileOperationW(lpFileOp)
+Copies, moves, renames or deletes files, with optional progress and
+confirmation UI.
+
+Paths in pFrom and pTo are lists of null-terminated strings ending with
+an extra null.
+
+@param lpFileOp SHFILEOPSTRUCT with the operation (FO_COPY, FO_MOVE,
+       FO_RENAME or FO_DELETE), source and destination lists and
+       FOF_* flags.
+@return 0 on success, or nonzero on failure. fAnyOperationsAborted is
+        set if the user cancelled.
+
+## SHGetFileInfo(pszPath, dwFileAttributes, psfi, cbFileInfo, uFlags)
+Retrieves selected information about a file-system object.
+
+SHGFI_USEFILEATTRIBUTES lets you query a file type without opening an
+existing file. The dwFileAttributes argument is used only with that flag.
+CE does not support SHGFI_EXETYPE, SHGFI_ICONLOCATION,
+SHGFI_LINKOVERLAY, SHGFI_OPENICON, SHGFI_SELECTED or
+SHGFI_SHELLICONSIZE. SHGFI_PIDL is not supported on HPC 2000. Destroy an
+icon returned in psfi with DestroyIcon.
+
+@param pszPath File path, extension, or supported fully qualified PIDL.
+@param dwFileAttributes Attributes to use with SHGFI_USEFILEATTRIBUTES.
+@param psfi Receives the requested file information.
+@param cbFileInfo Size of the SHFILEINFO structure in bytes.
+@param uFlags Information to retrieve and options for the query.
+@return A system image-list handle with SHGFI_SYSICONINDEX; otherwise,
+        nonzero on success or 0 on failure.
+
+## SHGetPathFromIDList(pidl, pszPath)
+Converts a file-system item identifier list to a path.
+
+The destination buffer must hold at least MAX_PATH characters. The
+function fails for locations outside the file system.
+
+@param pidl Fully qualified item identifier list to convert.
+@param pszPath Receives the path.
+@return TRUE on success, FALSE on failure.
+
+## SHGetShortcutTarget(szShortcut, szTarget, cbMax)
+Returns the target path of a shortcut file.
+
+@param szShortcut Path of the shortcut.
+@param szTarget Receives the target path.
+@param cbMax Size of szTarget in characters.
+@return TRUE on success, FALSE on failure.
+
+## SHGetSpecialFolderPath(hwndOwner, lpszPath, nFolder, fCreate)
+Retrieves the path of a special folder identified by a CSIDL.
+
+The output buffer must hold at least MAX_PATH characters. Virtual
+folders are not supported. A nonzero fCreate requests creation of the
+folder if it does not exist. The SDK reference says this function
+returns FALSE even when successful.
+
+@param hwndOwner Owner window for any dialog or message box.
+@param lpszPath Receives the folder path.
+@param nFolder CSIDL identifying the folder.
+@param fCreate Nonzero to create the folder if needed.
+@return FALSE, including on success; the return value does not indicate
+        whether the path was retrieved.
+
+## SHLoadDIBitmap(szFileName)
+Loads a .bmp file into a bitmap.
+
+Free with DeleteObject.
+
+@param szFileName Full path of the file.
+@return The bitmap, or NULL on failure.

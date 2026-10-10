@@ -1,0 +1,66 @@
+## ChooseColor(lpcc)
+Displays a dialog for choosing an RGB color.
+
+The dialog offers system colors and dithered variants, not palettes. On
+screens narrower than 480 pixels, user-defined colors are unavailable.
+
+@param lpcc Input settings for the dialog; on success, rgbResult receives
+            the selected color.
+@return TRUE if the user accepts. FALSE if canceled or an error occurs;
+        call CommDlgExtendedError to inspect an error.
+
+## CommDlgExtendedError()
+Returns extended error information for the most recent common-dialog call.
+
+After a successful dialog call, the return value is undefined. It is 0 if
+the user canceled, or a nonzero error code otherwise. CE includes
+CDERR_REGISTRYFAILURE for registry read failures.
+
+@return A CDERR_* or dialog-specific error code, or 0 after cancellation.
+
+## GetOpenFileNameW(lpofn)
+Displays the Open dialog and writes the selected full path to lpstrFile.
+
+CE ignores lCustData, lpfnHook and lpTemplateName, and does not support
+OFN_ALLOWMULTISELECT, OFN_ENABLEHOOK, OFN_ENABLETEMPLATE,
+OFN_ENABLETEMPLATEHANDLE, OFN_NOREADONLYRETURN, OFN_NOVALIDATE,
+OFN_READONLY or OFN_SHAREAWARE. On failure, use GetLastError; this
+function sets only ERROR_INVALID_PARAMETER or ERROR_OUTOFMEMORY.
+
+@param lpofn Input settings and output for the selection; set lStructSize,
+             lpstrFile and nMaxFile before calling.
+@return TRUE if the user selects a file. FALSE on cancellation or error.
+
+## GetSaveFileNameW(lpofn)
+Displays the Save dialog and writes the selected full path to lpstrFile.
+
+CE ignores lCustData, lpfnHook and lpTemplateName, and does not support
+OFN_ALLOWMULTISELECT, OFN_ENABLEHOOK, OFN_ENABLETEMPLATE,
+OFN_ENABLETEMPLATEHANDLE, OFN_NOREADONLYRETURN, OFN_NOVALIDATE,
+OFN_READONLY or OFN_SHAREAWARE. On failure, use GetLastError; this
+function sets only ERROR_INVALID_PARAMETER or ERROR_OUTOFMEMORY.
+
+@param lpofn Input settings and output for the selection; set lStructSize,
+             lpstrFile and nMaxFile before calling.
+@return TRUE if the user selects a file. FALSE on cancellation or error.
+
+## PageSetupDlgW(lppsd)
+Displays Page Setup to choose paper, source, orientation and margins.
+
+The function fills DEVNAMES offsets in bytes, not character units.
+
+@param lppsd Input settings for the dialog; receives the user's selections.
+@return TRUE if the user accepts. FALSE if canceled or an error occurs;
+        call CommDlgExtendedError to inspect an error.
+
+## PrintDlg(lppd)
+Displays the Print or Print Setup dialog and returns the user's selections.
+
+PageSetupDlg is the page-setup alternative on HPC 2000. If PrintDlg
+returns a device context, release it with DeleteDC. PD_RETURNDEFAULTDC
+can fail when the saved settings are invalid; show the dialog to select a
+valid printer or destination.
+
+@param lppd Input settings for the dialog; receives the user's selections.
+@return TRUE if the user accepts. FALSE if canceled or an error occurs;
+        call CommDlgExtendedError to inspect an error.

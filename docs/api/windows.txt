@@ -1,0 +1,11 @@
+## _fpieee_flt(exc_code, p, handler)
+Invokes a user handler for an IEEE floating-point exception.
+
+Use it as an exception filter in structured exception handling. The
+handler receives an _FPIEEE_RECORD describing the operation, operands
+and result.
+
+@param exc_code Exception code.
+@param p Exception information.
+@param handler IEEE exception handler.
+@return The value returned by handler.

@@ -1,0 +1,8 @@
+## _isctype(character, type)
+Tests whether a character has the specified classification property.
+
+The result is independent of locale.
+
+@param character Integer character to test.
+@param type Classification property to test.
+@return Nonzero if the character has the property, or 0 otherwise.

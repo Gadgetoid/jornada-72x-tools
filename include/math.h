@@ -1,0 +1,400 @@
+#ifndef JORNADA_MATH_H
+#define JORNADA_MATH_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+struct _complex {
+    double x;
+    double y;
+};
+
+#define HUGE_VAL __builtin_huge_val()
+
+/**
+ * Returns the arccosine of value in radians, from 0 to pi.
+ *
+ * @param value Value in the range -1 through 1.
+ * @return The arccosine, or an indefinite value (quiet NaN) outside the range.
+ */
+double acos(double value);
+/**
+ * Returns the arcsine of value in radians, from -pi/2 to pi/2.
+ *
+ * @param value Value in the range -1 through 1.
+ * @return The arcsine, or an indefinite value (quiet NaN) outside the range.
+ */
+double asin(double value);
+/**
+ * Returns the arctangent of value in radians, from -pi/2 to pi/2.
+ *
+ * @param value Value whose arctangent is calculated.
+ * @return The arctangent.
+ */
+double atan(double value);
+/**
+ * Returns the arctangent of y/x in radians, from -pi to pi.
+ *
+ * The signs of both inputs determine the result's quadrant. If both are
+ * zero, the result is zero.
+ *
+ * @param y Y coordinate of the point.
+ * @param x X coordinate of the point.
+ * @return The arctangent of y/x.
+ */
+double atan2(double y, double x);
+/**
+ * Returns the cosine of an angle in radians.
+ *
+ * For value >= 263 or value <= -263, the result loses significance and
+ * the function raises _TLOSS and returns an indefinite value (quiet NaN).
+ *
+ * @param value Angle in radians.
+ * @return The cosine, or an indefinite value when the angle is out of range.
+ */
+double cos(double value);
+/**
+ * Returns the sine of an angle in radians.
+ *
+ * For value >= 263 or value <= -263, the result loses significance and
+ * the function raises _TLOSS and returns an indefinite value (quiet NaN).
+ *
+ * @param value Angle in radians.
+ * @return The sine, or an indefinite value when the angle is out of range.
+ */
+double sin(double value);
+/**
+ * Returns the tangent of an angle in radians.
+ *
+ * For value >= 263 or value <= -263, the result loses significance and
+ * the function raises _TLOSS and returns an indefinite value (a quiet NaN).
+ * Use _matherr to customize math error handling.
+ *
+ * @param value Angle in radians.
+ * @return The tangent, or an indefinite value when the angle is out of range.
+ */
+double tan(double value);
+/**
+ * Returns the hyperbolic cosine of value.
+ *
+ * If the result is too large, returns HUGE_VAL.
+ *
+ * @param value Input value.
+ * @return The hyperbolic cosine, or HUGE_VAL if the result is too large.
+ */
+double cosh(double value);
+/**
+ * Returns the hyperbolic sine of value.
+ *
+ * If the result is too large, sinh returns HUGE_VAL with the result's sign.
+ * Use _matherr to customize math error handling.
+ *
+ * @param value Input value.
+ * @return The hyperbolic sine, or signed HUGE_VAL if the result is too large.
+ */
+double sinh(double value);
+/**
+ * Returns the hyperbolic tangent of value. It has no error return.
+ *
+ * @param value Input value.
+ * @return The hyperbolic tangent.
+ */
+double tanh(double value);
+/**
+ * Returns e raised to value.
+ *
+ * Overflow returns INF; underflow returns 0.
+ *
+ * @param value Exponent.
+ * @return The exponential, INF on overflow, or 0 on underflow.
+ */
+double exp(double value);
+/**
+ * Returns the natural logarithm of value.
+ *
+ * Negative input returns an indefinite value (quiet NaN); zero returns INF.
+ *
+ * @param value Positive value whose logarithm is calculated.
+ * @return The natural logarithm, an indefinite value for negative input,
+ *         or INF for zero.
+ */
+double log(double value);
+/**
+ * Returns the base-10 logarithm of value.
+ *
+ * Negative input returns an indefinite value (quiet NaN); zero returns INF.
+ *
+ * @param value Positive value whose logarithm is calculated.
+ * @return The base-10 logarithm, an indefinite value for negative input,
+ *         or INF for zero.
+ */
+double log10(double value);
+/**
+ * Raises base to exponent.
+ *
+ * Zero to the zero power returns 1. Zero to a negative power returns INF.
+ * Overflow and underflow do not print an error message.
+ *
+ * @param base Base value.
+ * @param exponent Exponent.
+ * @return base raised to exponent.
+ */
+double pow(double base, double exponent);
+/**
+ * Returns the square root of value.
+ *
+ * Negative input produces an indefinite value (a quiet NaN). Use _matherr
+ * to customize math error handling.
+ *
+ * @param value Nonnegative floating-point value.
+ * @return The square root, or an indefinite value for negative input.
+ */
+double sqrt(double value);
+/**
+ * Returns the smallest integer value greater than or equal to value.
+ *
+ * @param value Floating-point value.
+ * @return The ceiling as a double.
+ */
+double ceil(double value);
+/**
+ * Returns the largest integer value less than or equal to value.
+ *
+ * @param value Floating-point value.
+ * @return The floor as a double.
+ */
+double floor(double value);
+/**
+ * Returns the absolute value of value.
+ *
+ * @param value Floating-point value.
+ * @return The absolute value.
+ */
+double fabs(double value);
+/**
+ * Returns the floating-point remainder of dividend divided by divisor.
+ *
+ * The remainder has the sign of dividend and a magnitude less than
+ * divisor's. A zero divisor returns a quiet NaN.
+ *
+ * @param dividend Value to divide.
+ * @param divisor Divisor.
+ * @return The remainder, or a quiet NaN if divisor is zero.
+ */
+double fmod(double dividend, double divisor);
+/**
+ * Splits value into a mantissa and a power-of-two exponent.
+ *
+ * The mantissa's absolute value is at least 0.5 and less than 1, and
+ * value equals mantissa times 2 to exponent. For zero, both results are 0.
+ *
+ * @param value Floating-point value to split.
+ * @param exponent Receives the integer exponent.
+ * @return The mantissa.
+ */
+double frexp(double value, int *exponent);
+/**
+ * Multiplies value by 2 to the exponent.
+ *
+ * Overflow returns HUGE_VAL with the sign of value.
+ *
+ * @param value Floating-point value.
+ * @param exponent Integer power of two.
+ * @return The scaled value, or signed HUGE_VAL on overflow.
+ */
+double ldexp(double value, int exponent);
+/**
+ * Splits value into integer and fractional parts.
+ *
+ * Both parts have the sign of value; the integer part is stored as a double.
+ *
+ * @param value Floating-point value to split.
+ * @param integer Receives the integer part.
+ * @return The signed fractional part.
+ */
+double modf(double value, double *integer);
+/**
+ * Returns the magnitude of a complex number.
+ *
+ * The complex value has real and imaginary components. Overflow returns
+ * HUGE_VAL.
+ *
+ * @param value Complex number whose magnitude is calculated.
+ * @return The magnitude, or HUGE_VAL on overflow.
+ */
+double _cabs(struct _complex value);
+/**
+ * Returns the hypotenuse for sides x and y.
+ *
+ * @param x First side length.
+ * @param y Second side length.
+ * @return The hypotenuse, or INF on overflow.
+ */
+double _hypot(double x, double y);
+/**
+ * Returns value with its sign reversed.
+ *
+ * @param value Double-precision value to change.
+ * @return The value with the opposite sign.
+ */
+double _chgsign(double value);
+/**
+ * Returns value with the sign of sign.
+ *
+ * @param value Magnitude and value to return.
+ * @param sign Value whose sign is copied.
+ * @return value with the sign of sign.
+ */
+double _copysign(double value, double sign);
+/**
+ * Tests whether value is finite.
+ *
+ * @param value Double-precision value to test.
+ * @return Nonzero if value is neither infinite nor NaN; otherwise 0.
+ */
+int _finite(double value);
+/**
+ * Tests whether value is a NaN.
+ *
+ * @param value Double-precision value to test.
+ * @return Nonzero if value is NaN; otherwise 0.
+ */
+int _isnan(double value);
+/**
+ * Returns the floating-point classification of value.
+ *
+ * The classification distinguishes signed zero, normal and denormal
+ * values, infinities, and signaling or quiet NaNs.
+ *
+ * @param value Double-precision value to classify.
+ * @return An _FPCLASS_* classification code.
+ */
+int _fpclass(double value);
+/**
+ * Returns the unbiased exponent of value.
+ *
+ * Denormalized values are treated as if they were normalized.
+ *
+ * @param value Double-precision value to inspect.
+ * @return The unbiased exponent.
+ */
+double _logb(double value);
+/**
+ * Returns the nearest representable value to value toward direction.
+ *
+ * If the inputs are equal, value is returned without raising an
+ * exception. If either input is a quiet NaN, the result is one of them.
+ *
+ * @param value Starting value.
+ * @param direction Direction toward the neighboring representable value.
+ * @return The nearest representable neighbor toward direction.
+ */
+double _nextafter(double value, double direction);
+/**
+ * Scales value by a power of two.
+ *
+ * On overflow, returns HUGE_VAL with the sign of value.
+ *
+ * @param value Value to scale.
+ * @param exponent Power of two to apply.
+ * @return value multiplied by 2 to the exponent, or signed HUGE_VAL on overflow.
+ */
+double _scalb(double value, long exponent);
+double _frnd(double value);
+double _fsqrt(double value);
+/**
+ * Returns the order-zero Bessel function of the first kind.
+ *
+ * @param value Argument to the function.
+ * @return The order-zero Bessel function value.
+ */
+double _j0(double value);
+/**
+ * Returns the order-one Bessel function of the first kind.
+ *
+ * @param value Argument to the function.
+ * @return The order-one Bessel function value.
+ */
+double _j1(double value);
+/**
+ * Returns the Bessel function of the first kind for the specified order.
+ *
+ * @param order Integer order of the function.
+ * @param value Argument to the function.
+ * @return The Bessel function value.
+ */
+double _jn(int order, double value);
+/**
+ * Returns the order-zero Bessel function of the second kind.
+ *
+ * For negative value, the function reports _DOMAIN to stderr and returns
+ * _HUGE_VAL. Use _matherr to customize error handling.
+ *
+ * @param value Argument to the function; must not be negative.
+ * @return The order-zero Bessel function value, or _HUGE_VAL for negative input.
+ */
+double _y0(double value);
+/**
+ * Returns the order-one Bessel function of the second kind.
+ *
+ * For negative value, the function reports _DOMAIN to stderr and returns
+ * _HUGE_VAL. Use _matherr to customize error handling.
+ *
+ * @param value Argument to the function; must not be negative.
+ * @return The order-one Bessel function value, or _HUGE_VAL for negative input.
+ */
+double _y1(double value);
+/**
+ * Returns the Bessel function of the second kind for the specified order.
+ *
+ * For negative value, the function reports _DOMAIN to stderr and returns
+ * _HUGE_VAL. Use _matherr to customize error handling.
+ *
+ * @param order Integer order of the function.
+ * @param value Argument to the function; must not be negative.
+ * @return The Bessel function value, or _HUGE_VAL for negative input.
+ */
+double _yn(int order, double value);
+/**
+ * Returns and clears the floating-point status flags.
+ *
+ * The returned bits describe the status before it was cleared.
+ *
+ * @return Floating-point status flags.
+ */
+unsigned int _clearfp(void);
+/**
+ * Gets or updates the floating-point control word.
+ *
+ * With mask set to 0, the current control word is returned. Otherwise,
+ * bits set in mask are replaced with the corresponding bits from value.
+ * Floating-point exceptions are masked by default.
+ *
+ * @param value New values for the control bits selected by mask.
+ * @param mask Bits to read or update.
+ * @return The floating-point control state.
+ */
+unsigned int _controlfp(unsigned int value, unsigned int mask);
+/**
+ * Returns the floating-point status flags.
+ *
+ * The status includes pending unmasked exceptions, which are checked
+ * before the flags are returned.
+ *
+ * @return Floating-point status flags.
+ */
+unsigned int _statusfp(void);
+/**
+ * Reinitializes the floating-point math package.
+ *
+ * Use it when recovering from a floating-point exception before resuming
+ * floating-point work.
+ */
+void _fpreset(void);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
