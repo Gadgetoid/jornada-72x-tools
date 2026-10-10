@@ -4,7 +4,7 @@ A CMake toolchain for Windows CE 3.0 (Handheld PC 2000) ARM programs and DLLs, a
 
 ## LLVM
 
-Microsoft's CE ARM calling convention needs the `armv4-unknown-none-wince` target, which no LLVM release has. Download it from [velo-llvm-builds](https://github.com/Gadgetoid/velo-llvm-builds/releases) (v2 or later), then set `JORNADA_LLVM_ROOT` to the unpacked folder or link it as `llvm` here.
+Microsoft's CE ARM calling convention needs the `armv4-unknown-none-wince` target, which no LLVM release has. Download it from [velo-llvm-builds](https://github.com/Gadgetoid/velo-llvm-builds/releases) (v3 or later; v2 works without the C++ standard library), then set `JORNADA_LLVM_ROOT` to the unpacked folder or link it as `llvm` here.
 
 ## Usage
 
