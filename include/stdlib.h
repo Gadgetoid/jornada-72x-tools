@@ -67,6 +67,11 @@ typedef struct _ldiv_t {
     long rem;
 } ldiv_t;
 
+typedef struct {
+    long long quot;
+    long long rem;
+} lldiv_t;
+
 /**
  * Allocates a suitably aligned heap block of at least size bytes.
  *
@@ -378,6 +383,13 @@ unsigned long _lrotr(unsigned long value, int shift);
  * @param count Number of bytes to process.
  */
 void _swab(char *source, char *destination, int count);
+long long llabs(long long value);
+lldiv_t lldiv(long long dividend, long long divisor);
+long long strtoll(const char *string, char **end, int base);
+unsigned long long strtoull(const char *string, char **end, int base);
+long long atoll(const char *string);
+float strtof(const char *string, char **end);
+long double strtold(const char *string, char **end);
 
 #ifdef __cplusplus
 }

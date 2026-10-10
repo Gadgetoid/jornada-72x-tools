@@ -312,6 +312,7 @@ char *_strset(char *string, int character);
  * @return string.
  */
 char *_strnset(char *string, int character, size_t count);
+char *strerror(int number);
 
 #ifdef __cplusplus
 }

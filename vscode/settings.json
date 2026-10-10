@@ -2,9 +2,27 @@
     "cmake.useCMakePresets": "always",
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "C_Cpp.default.compilerPath": "${env:JORNADA_TOOLCHAIN}/llvm/bin/clang",
-    "C_Cpp.default.compilerArgs": ["--target=armv4-unknown-none-wince", "-mcpu=strongarm", "-marm", "-fshort-wchar", "-ffreestanding"],
-    "C_Cpp.default.includePath": ["${env:JORNADA_TOOLCHAIN}/include", "${env:JORNADA_TOOLCHAIN}/include/w32api", "${workspaceFolder}/**"],
-    "C_Cpp.default.defines": ["_WIN32_WCE=300", "ARM", "_ARM_", "ARMV4"],
+    "C_Cpp.default.compilerArgs": [
+        "--target=armv4-unknown-none-wince",
+        "-mcpu=strongarm",
+        "-marm",
+        "-fshort-wchar",
+        "-ffreestanding",
+        "-nostdinc++"
+    ],
+    "C_Cpp.default.includePath": [
+        "${env:JORNADA_TOOLCHAIN}/include/jornada/libcxx",
+        "${env:JORNADA_TOOLCHAIN}/llvm/include/c++/v1",
+        "${env:JORNADA_TOOLCHAIN}/include",
+        "${env:JORNADA_TOOLCHAIN}/include/w32api",
+        "${workspaceFolder}/**"
+    ],
+    "C_Cpp.default.defines": [
+        "_WIN32_WCE=300",
+        "ARM",
+        "_ARM_",
+        "ARMV4"
+    ],
     "C_Cpp.default.cStandard": "c17",
     "C_Cpp.default.cppStandard": "c++20",
     "C_Cpp.default.intelliSenseMode": "clang-arm",

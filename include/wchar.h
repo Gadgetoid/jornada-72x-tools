@@ -16,6 +16,18 @@ typedef unsigned short wctype_t;
 
 #define WEOF ((wint_t)0xFFFF)
 
+#ifndef _FILE_DEFINED
+typedef void FILE;
+#define _FILE_DEFINED
+#endif
+
+#ifndef _MBSTATE_T_DEFINED
+#define _MBSTATE_T_DEFINED
+typedef struct {
+    unsigned state;
+} mbstate_t;
+#endif
+
 #define _UPPER 0x0001
 #define _LOWER 0x0002
 #define _DIGIT 0x0004
@@ -285,7 +297,22 @@ wchar_t towupper(wchar_t character);
  * @param format Format string, followed by the values to format.
  * @return Characters written, not counting the terminating null.
  */
+#ifdef JORNADA_C99_SWPRINTF
+int __jornada_c99_swprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...);
+#define swprintf __jornada_c99_swprintf
+#else
+/**
+ * Formats values into a string buffer, printf style.
+ *
+ * Supports the same conversions as printf, including floating point. Doesn't
+ * check the buffer size: use _snwprintf to limit it.
+ *
+ * @param buffer Buffer that receives the output. Must be large enough.
+ * @param format Format string, followed by the values to format.
+ * @return Characters written, not counting the terminating null.
+ */
 int swprintf(wchar_t *buffer, const wchar_t *format, ...);
+#endif
 /**
  * Formats values from a va_list into a string buffer, printf style.
  *
@@ -396,6 +423,28 @@ wchar_t *_ltow(long value, wchar_t *buffer, int radix);
  * @return buffer.
  */
 wchar_t *_ultow(unsigned long value, wchar_t *buffer, int radix);
+wchar_t *wmemchr(const wchar_t *memory, wchar_t value, size_t count);
+int wmemcmp(const wchar_t *first, const wchar_t *second, size_t count);
+wchar_t *wmemcpy(wchar_t *destination, const wchar_t *source, size_t count);
+wchar_t *wmemmove(wchar_t *destination, const wchar_t *source, size_t count);
+wchar_t *wmemset(wchar_t *destination, wchar_t value, size_t count);
+long long wcstoll(const wchar_t *string, wchar_t **end, int base);
+unsigned long long wcstoull(const wchar_t *string, wchar_t **end, int base);
+float wcstof(const wchar_t *string, wchar_t **end);
+long double wcstold(const wchar_t *string, wchar_t **end);
+
+int iswalnum(wint_t character);
+int iswalpha(wint_t character);
+int iswcntrl(wint_t character);
+int iswdigit(wint_t character);
+int iswgraph(wint_t character);
+int iswlower(wint_t character);
+int iswprint(wint_t character);
+int iswpunct(wint_t character);
+int iswspace(wint_t character);
+int iswupper(wint_t character);
+int iswxdigit(wint_t character);
+int iswblank(wint_t character);
 
 #define iswalpha(character) iswctype(character, _ALPHA)
 #define iswupper(character) iswctype(character, _UPPER)

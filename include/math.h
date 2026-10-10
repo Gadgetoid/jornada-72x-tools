@@ -11,6 +11,15 @@ struct _complex {
 };
 
 #define HUGE_VAL __builtin_huge_val()
+#define HUGE_VALF __builtin_huge_valf()
+#define HUGE_VALL __builtin_huge_vall()
+#define INFINITY __builtin_inff()
+#define NAN __builtin_nanf("")
+#define FP_NAN 0
+#define FP_INFINITE 1
+#define FP_ZERO 2
+#define FP_SUBNORMAL 3
+#define FP_NORMAL 4
 
 /**
  * Returns the arccosine of value in radians, from 0 to pi.
@@ -392,6 +401,80 @@ unsigned int _statusfp(void);
  * floating-point work.
  */
 void _fpreset(void);
+double trunc(double value);
+double round(double value);
+long lround(double value);
+long long llround(double value);
+double fmin(double first, double second);
+double fmax(double first, double second);
+double fdim(double first, double second);
+double log2(double value);
+double exp2(double value);
+double cbrt(double value);
+double hypot(double x, double y);
+double copysign(double value, double sign);
+float sqrtf(float value);
+float sinf(float value);
+float cosf(float value);
+float tanf(float value);
+float asinf(float value);
+float acosf(float value);
+float atanf(float value);
+float atan2f(float y, float x);
+float sinhf(float value);
+float coshf(float value);
+float tanhf(float value);
+float expf(float value);
+float logf(float value);
+float log10f(float value);
+float log2f(float value);
+float exp2f(float value);
+float powf(float base, float exponent);
+float floorf(float value);
+float ceilf(float value);
+float truncf(float value);
+float roundf(float value);
+float fmodf(float dividend, float divisor);
+float fabsf(float value);
+float fminf(float first, float second);
+float fmaxf(float first, float second);
+float hypotf(float x, float y);
+float copysignf(float value, float sign);
+float cbrtf(float value);
+float ldexpf(float value, int exponent);
+float frexpf(float value, int *exponent);
+float modff(float value, float *integer);
+long double sqrtl(long double value);
+long double sinl(long double value);
+long double cosl(long double value);
+long double tanl(long double value);
+long double asinl(long double value);
+long double acosl(long double value);
+long double atanl(long double value);
+long double sinhl(long double value);
+long double coshl(long double value);
+long double tanhl(long double value);
+long double expl(long double value);
+long double logl(long double value);
+long double log10l(long double value);
+long double floorl(long double value);
+long double ceill(long double value);
+long double truncl(long double value);
+long double roundl(long double value);
+long double log2l(long double value);
+long double exp2l(long double value);
+long double cbrtl(long double value);
+long double atan2l(long double y, long double x);
+long double powl(long double base, long double exponent);
+long double fmodl(long double dividend, long double divisor);
+long double fminl(long double first, long double second);
+long double fmaxl(long double first, long double second);
+long double hypotl(long double x, long double y);
+long double copysignl(long double value, long double sign);
+long double fabsl(long double value);
+long double ldexpl(long double value, int exponent);
+long double frexpl(long double value, int *exponent);
+long double modfl(long double value, long double *integer);
 
 #ifdef __cplusplus
 }

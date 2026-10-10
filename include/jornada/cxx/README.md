@@ -1,6 +1,6 @@
 # jornada/cxx
 
-A header-only C++20 layer over the Windows CE API, in namespace `jornada`. It needs the toolchain's C++ support (see the main README), and nothing else: no exceptions, RTTI or standard library.
+A header-only C++20 layer over the Windows CE API, in namespace `jornada`. It needs the toolchain's C++ support (see the main README), and nothing else: no exceptions, RTTI or standard library. It works alongside the standard library where that's available.
 
 - It should cost nothing over the C it replaces: everything is inline, and the window base dispatches messages with no virtual calls.
 - Errors are values. Functions that can fail return `jornada::result<T>`, which holds a `T` or a `jornada::error` (a `GetLastError` code or an HRESULT).

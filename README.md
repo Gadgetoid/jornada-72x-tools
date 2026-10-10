@@ -25,14 +25,23 @@ cmake --build build
 
 - Import libraries (`jornada::<dll>`) come from the Jornada 720 ROM's export tables (`exports/ce3`). `coredll` is always linked.
 - `windows.h` gives the Win32 API, plus the C runtime that coredll exports (stdio, math, `malloc`, `printf`, `setjmp`). Everything is checked against the Handheld PC 2000 SDK headers.
-- C++20 without exceptions or RTTI, with a header-only layer in `include/jornada/cxx` (see its README).
+- C++20 without exceptions or RTTI, with a header-only layer in `include/jornada/cxx` (see its README), and the C++ standard library (below).
 - `vscode/settings.json` sets up IntelliSense through CMake Tools.
+
+## C++ standard library
+
+With an LLVM that includes libc++ (velo-llvm-builds v3 or later), C++ code gets the standard library: strings and `string_view`, the containers, `<algorithm>`, `optional`, `variant`, `any`, `expected`, smart pointers, `std::function`, ranges, `<random>` and `std::format`. See `examples/stl-text` and `examples/stl-collections`.
+
+- It's configured without threads, locales, iostreams, filesystem or exceptions. An error that would throw writes a message to the debug output and stops the program.
+- The parts libc++ keeps in its library are built from its sources (`jornada::cxx_stdlib`, linked automatically). Floating point `to_chars`, used by `std::format`, is over coredll's `_snprintf`: exact with a precision, 17 significant digits (9 for `float`) without one.
+- The runtime adds the C99 functions libc++ needs that coredll lacks: `snprintf`, `strtoll`, `float` and `long double` maths, `errno`, `wmemcpy` and others. `swprintf` keeps Microsoft's form; define `JORNADA_C99_SWPRINTF` for C99's.
 
 ## Make
 
 - `make examples`: build `examples/` into `build/ce3`
 - `make check-abi`: check the compiler follows Microsoft's Windows CE ARM calling standard
 - `make check-cxx-headers`: check the headers compile as C++
+- `make check-stdlib`: build and link a program using most of the standard library
 - `make headers`, `make check-headers`: regenerate and check the headers against the SDK (needs `reference/sdk`, not included)
 - `make exports ROM=jornada720.bin`: rewrite the export lists from a ROM image
 

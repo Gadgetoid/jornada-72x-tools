@@ -377,6 +377,10 @@ int vfprintf(FILE *stream, const char *format, va_list arguments);
  */
 int vsprintf(char *buffer, const char *format, va_list arguments);
 int _vsnprintf(char *buffer, size_t count, const char *format, va_list arguments);
+int snprintf(char *buffer, size_t count, const char *format, ...);
+int remove(const char *path);
+int rename(const char *existing, const char *replacement);
+int vsnprintf(char *buffer, size_t count, const char *format, va_list arguments);
 /**
  * Reads and converts formatted input from stdin.
  *

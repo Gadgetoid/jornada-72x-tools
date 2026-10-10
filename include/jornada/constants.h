@@ -9282,149 +9282,14 @@
 #ifndef USHRT_MAX
 #define USHRT_MAX 0xFFFF
 #endif
-#ifndef acosl
-#define acosl(x) ((long double)acos((double)(x)))
-#endif
-#ifndef asinl
-#define asinl(x) ((long double)asin((double)(x)))
-#endif
-#ifndef atan2l
-#define atan2l(x,y) ((long double)atan2((double)(x), (double)(y)))
-#endif
-#ifndef atanl
-#define atanl(x) ((long double)atan((double)(x)))
-#endif
-#ifndef ceill
-#define ceill(x) ((long double)ceil((double)(x)))
-#endif
 #ifndef complex
 #define complex _complex
-#endif
-#ifndef coshl
-#define coshl(x) ((long double)cosh((double)(x)))
-#endif
-#ifndef cosl
-#define cosl(x) ((long double)cos((double)(x)))
-#endif
-#ifndef expl
-#define expl(x) ((long double)exp((double)(x)))
-#endif
-#ifndef fabsl
-#define fabsl(x) ((long double)fabs((double)(x)))
-#endif
-#ifndef floorl
-#define floorl(x) ((long double)floor((double)(x)))
-#endif
-#ifndef fmodl
-#define fmodl(x,y) ((long double)fmod((double)(x), (double)(y)))
-#endif
-#ifndef frexpl
-#define frexpl(x,y) ((long double)frexp((double)(x), (y)))
-#endif
-#ifndef hypotl
-#define hypotl(x,y) ((long double)hypot((double)(x), (double)(y)))
-#endif
-#ifndef isalnum
-#define isalnum(_c) ( _isctype(_c,_ALPHA|_DIGIT) )
-#endif
-#ifndef isalpha
-#define isalpha(_c) ( _isctype(_c,_ALPHA) )
 #endif
 #ifndef isascii
 #define isascii __isascii
 #endif
-#ifndef iscntrl
-#define iscntrl(_c) ( _isctype(_c,_CONTROL) )
-#endif
-#ifndef isdigit
-#define isdigit(_c) ( _isctype(_c,_DIGIT) )
-#endif
-#ifndef isgraph
-#define isgraph(_c) ( _isctype(_c,_PUNCT|_ALPHA|_DIGIT) )
-#endif
-#ifndef islower
-#define islower(_c) ( _isctype(_c,_LOWER) )
-#endif
-#ifndef isprint
-#define isprint(_c) ( _isctype(_c,_BLANK|_PUNCT|_ALPHA|_DIGIT) )
-#endif
-#ifndef ispunct
-#define ispunct(_c) ( _isctype(_c,_PUNCT) )
-#endif
-#ifndef isspace
-#define isspace(_c) ( _isctype(_c,_SPACE) )
-#endif
-#ifndef isupper
-#define isupper(_c) ( _isctype(_c,_UPPER) )
-#endif
-#ifndef iswalnum
-#define iswalnum(_c) ( iswctype(_c,_ALPHA|_DIGIT) )
-#endif
-#ifndef iswalpha
-#define iswalpha(_c) ( iswctype(_c,_ALPHA) )
-#endif
-#ifndef iswcntrl
-#define iswcntrl(_c) ( iswctype(_c,_CONTROL) )
-#endif
-#ifndef iswdigit
-#define iswdigit(_c) ( iswctype(_c,_DIGIT) )
-#endif
-#ifndef iswgraph
-#define iswgraph(_c) ( iswctype(_c,_PUNCT|_ALPHA|_DIGIT) )
-#endif
-#ifndef iswlower
-#define iswlower(_c) ( iswctype(_c,_LOWER) )
-#endif
-#ifndef iswprint
-#define iswprint(_c) ( iswctype(_c,_BLANK|_PUNCT|_ALPHA|_DIGIT) )
-#endif
-#ifndef iswpunct
-#define iswpunct(_c) ( iswctype(_c,_PUNCT) )
-#endif
-#ifndef iswspace
-#define iswspace(_c) ( iswctype(_c,_SPACE) )
-#endif
-#ifndef iswupper
-#define iswupper(_c) ( iswctype(_c,_UPPER) )
-#endif
-#ifndef iswxdigit
-#define iswxdigit(_c) ( iswctype(_c,_HEX) )
-#endif
-#ifndef isxdigit
-#define isxdigit(_c) ( _isctype(_c,_HEX) )
-#endif
-#ifndef ldexpl
-#define ldexpl(x,y) ((long double)ldexp((double)(x), (y)))
-#endif
-#ifndef log10l
-#define log10l(x) ((long double)log10((double)(x)))
-#endif
-#ifndef logl
-#define logl(x) ((long double)log((double)(x)))
-#endif
-#ifndef modfl
-#define modfl(x,y) ((long double)modf((double)(x), (double *)(y)))
-#endif
 #ifndef onexit_t
 #define onexit_t _onexit_t
-#endif
-#ifndef powl
-#define powl(x,y) ((long double)pow((double)(x), (double)(y)))
-#endif
-#ifndef sinhl
-#define sinhl(x) ((long double)sinh((double)(x)))
-#endif
-#ifndef sinl
-#define sinl(x) ((long double)sin((double)(x)))
-#endif
-#ifndef sqrtl
-#define sqrtl(x) ((long double)sqrt((double)(x)))
-#endif
-#ifndef tanhl
-#define tanhl(x) ((long double)tanh((double)(x)))
-#endif
-#ifndef tanl
-#define tanl(x) ((long double)tan((double)(x)))
 #endif
 #ifndef va_arg
 #define va_arg(ap,t) ( *(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)) )

@@ -23,10 +23,41 @@ def sdk_headers():
     return sorted(os.path.relpath(path, os.path.join(ROOT, "include")) for path in glob.glob(os.path.join(ROOT, "include", "jornada", "cxx", "*.h")))
 
 
-def compile_source(clang, version, arch, target_arch, source, extra):
+STANDARD_HEADERS = ["algorithm", "any", "array", "bit", "bitset", "charconv", "chrono", "cmath", "compare", "complex", "concepts", "cstdint",
+                    "cstdio", "cstdlib", "cstring", "cwchar", "cwctype", "deque", "expected", "format", "forward_list", "functional",
+                    "initializer_list", "iterator", "limits", "list", "map", "memory", "new", "numbers", "numeric", "optional", "queue",
+                    "random", "ranges", "ratio", "set", "span", "stack", "string", "string_view", "tuple", "type_traits",
+                    "unordered_map", "unordered_set", "utility", "variant", "vector", "version"]
+
+
+def libcxx_include(clang):
+    folder = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(clang))), "include", "c++", "v1")
+    return folder if os.path.exists(os.path.join(folder, "__config")) else None
+
+
+def compile_source(clang, version, arch, target_arch, source, extra, libcxx=None):
+    standard = ["-nostdinc++", "-isystem", os.path.join(ROOT, "include", "jornada", "libcxx"), "-isystem", libcxx] if libcxx else []
     command = [clang, *ARCHITECTURES[target_arch]["target"], *COMMON_FLAGS, *ARCHITECTURES[arch]["defines"], "-D_WIN32_WCE=%d" % WIN32_WCE[version],
-               "-I", os.path.join(ROOT, "include"), "-I", os.path.join(ROOT, "include", "w32api"), *extra, "-"]
+               *standard, "-isystem" if libcxx else "-I", os.path.join(ROOT, "include"), "-isystem" if libcxx else "-I",
+               os.path.join(ROOT, "include", "w32api"), *extra, "-"]
     return subprocess.run(command, input=source, capture_output=True, text=True)
+
+
+def check_libcxx(clang, version, arch, target_arch):
+    libcxx = libcxx_include(clang)
+    if not libcxx:
+        return []
+    problems = []
+    for header in STANDARD_HEADERS:
+        result = compile_source(clang, version, arch, target_arch, "#include <windows.h>\n#include <%s>\n" % header, ["-std=c++23", "-fsyntax-only"], libcxx)
+        if result.returncode:
+            problems.append("<%s> doesn't compile with libc++:\n%s" % (header, result.stderr))
+    with open(os.path.join(ROOT, "tests", "cxx-sdk.cpp")) as source:
+        result = compile_source(clang, version, arch, target_arch, source.read(), ["-fsyntax-only", "-Wall", "-Wextra", "-Werror", "-Wno-unused-parameter"],
+                                libcxx)
+    if result.returncode:
+        problems.append("tests/cxx-sdk.cpp doesn't compile with libc++:\n%s" % result.stderr)
+    return problems
 
 
 def cplusplus_linkage(tree):
@@ -100,6 +131,7 @@ if __name__ == "__main__":
     label = " " + arguments.arch.upper()
     for version in WIN32_WCE:
         problems = check(arguments.clang, version, arguments.arch, arguments.target_arch or arguments.arch)
+        problems += check_libcxx(arguments.clang, version, arguments.arch, arguments.target_arch or arguments.arch)
         for problem in problems:
             print("CE %s%s: %s" % (VERSION_NAMES[version], label, problem), file=sys.stderr)
         failed = failed or bool(problems)

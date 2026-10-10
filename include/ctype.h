@@ -19,6 +19,18 @@ extern "C" {
 int _isctype(int character, int type);
 int tolower(int character);
 int toupper(int character);
+int isalnum(int character);
+int isalpha(int character);
+int iscntrl(int character);
+int isdigit(int character);
+int isgraph(int character);
+int islower(int character);
+int isprint(int character);
+int ispunct(int character);
+int isspace(int character);
+int isupper(int character);
+int isxdigit(int character);
+int isblank(int character);
 
 #define isalpha(character) _isctype(character, _ALPHA)
 #define isupper(character) _isctype(character, _UPPER)
