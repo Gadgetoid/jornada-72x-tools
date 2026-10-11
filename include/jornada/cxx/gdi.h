@@ -103,6 +103,14 @@ public:
         return select_guard(dc, object);
     }
 
+    /**
+     * The height of a line of text in the selected font, or 0 if it can't be measured.
+     */
+    int text_height() const {
+        TEXTMETRICW metrics;
+        return GetTextMetricsW(dc, &metrics) ? metrics.tmHeight : 0;
+    }
+
     int draw_text(wstring_view text, RECT bounds, UINT format) const {
         return DrawTextW(dc, text.data(), static_cast<int>(text.size()), &bounds, format);
     }

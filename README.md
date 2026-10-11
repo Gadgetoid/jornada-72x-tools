@@ -36,12 +36,28 @@ With an LLVM that includes libc++ (velo-llvm-builds v3 or later), C++ code gets 
 - The parts libc++ keeps in its library are built from its sources (`jornada::cxx_stdlib`, linked automatically). Floating point `to_chars`, used by `std::format`, is over coredll's `_snprintf`: exact with a precision, 17 significant digits (9 for `float`) without one.
 - The runtime adds the C99 functions libc++ needs that coredll lacks: `snprintf`, `strtoll`, `float` and `long double` maths, `errno`, `wmemcpy` and others. `swprintf` keeps Microsoft's form; define `JORNADA_C99_SWPRINTF` for C99's.
 
+## debugmgr
+
+`debugmgr.exe` (`make debugmgr`, into `build/debugmgr`) runs on the device and lets `tools/jornada-debug` copy files, list folders and start and stop programs over TCP: through ActiveSync, a CF network card or anything else that gives the device an address. Copy it over once, start it, and it shows the address and port (2100) to connect to.
+
+```sh
+export JORNADA_DEVICE=192.168.55.101
+tools/jornada-debug ping
+tools/jornada-debug put build/ce3/hello/hello.exe /Windows/hello.exe
+tools/jornada-debug run /Windows/hello.exe     # prints the process ID
+tools/jornada-debug kill 0x1234
+```
+
+It also has `get`, `ls`, `rm`, `mkdir`, `rmdir`, `mv`, `quit` and `handover`. Anything that can reach the port can copy files to the device and run programs, so only leave it running on a network you trust. The protocol is in `debugmgr/PROTOCOL.md`.
+
 ## Make
 
 - `make examples`: build `examples/` into `build/ce3`
 - `make check-abi`: check the compiler follows Microsoft's Windows CE ARM calling standard
 - `make check-cxx-headers`: check the headers compile as C++
 - `make check-stdlib`: build and link a program using most of the standard library
+- `make debugmgr`: build `debugmgr.exe`
+- `make check-debugmgr`: test debugmgr's protocol and `jornada-debug`, with debugmgr built for this computer serving a folder
 - `make headers`, `make check-headers`: regenerate and check the headers against the SDK (needs `reference/sdk`, not included)
 - `make exports ROM=jornada720.bin`: rewrite the export lists from a ROM image
 

@@ -7,11 +7,18 @@ JORNADA_REFERENCE ?= $(CURDIR)/reference/sdk
 export JORNADA_REFERENCE
 EXPORT_DLLS = addrstor asform ceshell commctrl commdlg coredll cxport htmlview imgdecmp inkx mlang mqoa msgstore msmqrt mshtml ndis ole32 oleaut32 richink secur32 shdocvw tnefutil toolhelp urlmon webview wininet winscard winsock
 
-.PHONY: examples exports headers docstrings check-abi check-headers check-cxx-headers check-stdlib clean
+.PHONY: examples debugmgr check-debugmgr exports headers docstrings check-abi check-headers check-cxx-headers check-stdlib clean
 
 examples:
 	cmake -S examples -B build/ce3 -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN)
 	cmake --build build/ce3
+
+debugmgr:
+	cmake -S debugmgr -B build/debugmgr -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN)
+	cmake --build build/debugmgr
+
+check-debugmgr:
+	python3 tests/check-debugmgr.py
 
 exports:
 	python3 tools/cerom.py $(ROM) --exports exports/ce3 $(foreach dll,$(EXPORT_DLLS),--dll $(dll).dll)
