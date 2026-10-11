@@ -102,6 +102,23 @@ uint32_t ce_device::run(const std::u16string &program, const std::u16string &arg
     return status_ok;
 }
 
+uint32_t ce_device::kill_other(uint32_t process) {
+    HANDLE handle = OpenProcess(0, FALSE, process);
+    if (!handle) {
+        return status_no_such_process;
+    }
+    DWORD deadline = GetTickCount() + kill_milliseconds;
+    while (!process_ended(handle) && TerminateProcess(handle, 0)) {
+        if (static_cast<LONG>(GetTickCount() - deadline) >= 0) {
+            CloseHandle(handle);
+            return status_still_running;
+        }
+        Sleep(kill_retry_milliseconds);
+    }
+    CloseHandle(handle);
+    return status_ok;
+}
+
 uint32_t ce_device::kill(uint32_t process) {
     started_process *found = nullptr;
     for (started_process &candidate : processes) {
@@ -110,7 +127,7 @@ uint32_t ce_device::kill(uint32_t process) {
         }
     }
     if (!found) {
-        return status_no_such_process;
+        return kill_other(process);
     }
     DWORD deadline = GetTickCount() + kill_milliseconds;
     while (!process_ended(found->handle) && TerminateProcess(found->handle, 0)) {

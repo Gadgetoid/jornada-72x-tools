@@ -106,6 +106,8 @@ def run(checker, port, sandbox, work):
     checker.tool("kill", "0x1000")
     output = checker.tool("kill", "0x1000", expect_failure=True)
     checker.expect("no such process" in output, "kill of an ended process: %r" % output)
+    output = checker.tool("--socket", "/nonexistent/agent.sock", "ping", expect_failure=True)
+    checker.expect("jornada-debug:" in output, "ping through a missing agent socket: %r" % output)
 
     output = checker.tool("rmdir", "/Windows", expect_failure=True)
     checker.expect("Windows error 145" in output, "rmdir of a full folder: %r" % output)

@@ -48,7 +48,9 @@ tools/jornada-debug run /Windows/hello.exe     # prints the process ID
 tools/jornada-debug kill 0x1234
 ```
 
-It also has `get`, `ls`, `rm`, `mkdir`, `rmdir`, `mv`, `quit` and `handover`. Anything that can reach the port can copy files to the device and run programs, so only leave it running on a network you trust. The protocol is in `debugmgr/PROTOCOL.md`.
+In an emulator, debugmgr can use the emulator's host mailbox instead of TCP: start it with `mailbox` on its command line, or set the registry value `HKLM\Software\debugmgr\Transport` to `mailbox`, and point `jornada-debug --socket` (or `JORNADA_AGENT`) at the emulator's agent socket. On a real device the mailbox call would end debugmgr, so it's only used when selected.
+
+It also has `get`, `ls`, `rm`, `mkdir`, `rmdir`, `mv`, `quit` and `handover`. `kill` ends any process, not just ones debugmgr started. Anything that can reach the port can copy files to the device and run programs, so only leave it running on a network you trust. The protocol is in `debugmgr/PROTOCOL.md`.
 
 ## Make
 

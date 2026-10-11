@@ -22,6 +22,8 @@ public:
     uint32_t move(const std::u16string &from, const std::u16string &to) override;
 
 private:
+    uint32_t kill_other(uint32_t process);
+
     struct started_process {
         DWORD id = 0;
         HANDLE handle = nullptr;

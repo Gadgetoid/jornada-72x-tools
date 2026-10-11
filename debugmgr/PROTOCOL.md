@@ -1,8 +1,15 @@
 # debugmgr protocol
 
-debugmgr listens on TCP port 2100 (or the port given on its command line) and serves one connection at a time. Each message is
-framed as a u32 little-endian length followed by the message. A request longer than the maximum message size closes the
-connection.
+debugmgr reads requests and sends one reply to each, over one of two transports:
+
+- TCP, by default: it listens on port 2100 (or the port given on its command line) and serves one connection at a time. Each
+  message is framed as a u32 little-endian length followed by the message. A request longer than the maximum message size closes
+  the connection.
+- An emulator's host mailbox, when the command line contains `mailbox` or the registry value `HKLM\Software\debugmgr\Transport`
+  is the string `mailbox`. debugmgr calls the emulator with `swi 0x0051CE` in ARM state: r0 = operation (0 probe, 1 receive,
+  2 send), r1 = buffer, r2 = length; the result is in r0, and probe also returns the maximum message size in r1. Receive returns
+  0 when nothing is waiting, and debugmgr sleeps 10 ms. The emulator frames messages on its `--agent` socket as above. On real
+  hardware the SWI would end debugmgr, so it's only used when selected.
 
 All integers are little-endian. Strings are a u16 count of UTF-16 code units followed by that many UTF-16LE code units, with no
 terminator. Paths are CE paths, `\` separated and absolute. Fields aren't aligned.
@@ -22,7 +29,7 @@ Clients use sequences 0x0001 to 0x7FFF. 0x8000 to 0xFFFF are kept for a debugger
 | 0 | done |
 | 0x20000001 | unknown command |
 | 0x20000002 | malformed request |
-| 0x20000003 | no such process: KILL only knows programs started by RUN |
+| 0x20000003 | no such process |
 | 0x20000005 | KILL: still running after 5 seconds |
 | other | the Windows error from `GetLastError`, e.g. 2 file not found, 3 path not found, 5 access denied, 80 or 183 exists, 112 disk full, 145 folder not empty |
 
@@ -47,9 +54,9 @@ WRITE flag 0x1 creates the file, or truncates it if it exists. Without it the fi
 
 READ returns fewer bytes than asked at the end of the file, or when the reply would exceed the maximum message size.
 
-The process ID is CE's `dwProcessId` from `CreateProcessW`. debugmgr remembers the last 16 programs it started for KILL, forgetting
-the oldest after that. KILL waits up to 5 seconds for the program to end.
+The process ID is CE's `dwProcessId` from `CreateProcessW`. KILL ends any process: debugmgr keeps handles to the last 16 programs it
+started, and opens others with `OpenProcess`. It waits up to 5 seconds for the program to end.
 
 LIST stops early if the reply would exceed the maximum message size.
 
-This is the protocol velo-toolchain's debugmgr uses through velo-emu's mailbox, with TCP framing in its place.
+This is velo-toolchain's debugmgr protocol, version 1, with `_WIN32_WCE` 300.

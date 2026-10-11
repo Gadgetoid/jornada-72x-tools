@@ -5,6 +5,7 @@
 #include <jornada/cxx/window.h>
 
 #include "device_ce.h"
+#include "mailbox.h"
 #include "server.h"
 
 namespace {
@@ -15,6 +16,27 @@ constexpr UINT address_refresh_milliseconds = 3000;
 constexpr int window_width = 420;
 constexpr int window_height = 150;
 constexpr int margin = 8;
+constexpr const wchar_t *settings_key = L"Software\\debugmgr";
+constexpr const wchar_t *transport_value = L"Transport";
+constexpr const wchar_t *mailbox_transport = L"mailbox";
+
+bool registry_selects_mailbox() {
+    HKEY key;
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, settings_key, 0, 0, &key) != ERROR_SUCCESS) {
+        return false;
+    }
+    wchar_t value[16] = {};
+    DWORD type = 0;
+    DWORD size = sizeof(value) - sizeof(wchar_t);
+    bool selected = RegQueryValueExW(key, transport_value, nullptr, &type, reinterpret_cast<BYTE *>(value), &size) == ERROR_SUCCESS &&
+                    type == REG_SZ && _wcsicmp(value, mailbox_transport) == 0;
+    RegCloseKey(key);
+    return selected;
+}
+
+bool command_line_selects_mailbox(const wchar_t *command_line) {
+    return wcsstr(command_line, mailbox_transport) != nullptr;
+}
 
 struct status_snapshot {
     bool listening = false;
@@ -60,7 +82,7 @@ class status_window : public jornada::window<status_window> {
 public:
     static constexpr const wchar_t *class_name = L"JornadaDebugManager";
 
-    status_window(shared_status &status, uint16_t port) : status(status), port(port) {}
+    status_window(shared_status &status, uint16_t port, bool mailbox) : status(status), port(port), mailbox(mailbox) {}
 
     bool on_create() {
         addresses = local_addresses();
@@ -74,15 +96,19 @@ public:
         LeaveCriticalSection(&status.lock);
 
         jornada::wstring<160> listening;
-        if (now.failed) {
+        if (mailbox) {
+            listening = now.failed ? jornada::wstring<160>(L"No emulator host mailbox: run on the emulator, or without \"mailbox\"")
+                                   : jornada::wstring<160>(L"Serving the emulator's host mailbox");
+        } else if (now.failed) {
             listening = jornada::format<160>(L"Can't listen on port %u", static_cast<unsigned>(port));
         } else if (addresses.empty()) {
             listening = jornada::format<160>(L"Listening on port %u, no network address yet", static_cast<unsigned>(port));
         } else {
             listening = jornada::format<160>(L"Connect to %s port %u", addresses, static_cast<unsigned>(port));
         }
-        jornada::wstring<64> connection = now.connected ? jornada::format<64>(L"Connected to %s", dotted(now.client))
-                                                        : jornada::wstring<64>(L"Waiting for a connection");
+        jornada::wstring<64> connection = mailbox          ? jornada::wstring<64>(L"Requests arrive from the emulator")
+                                          : now.connected ? jornada::format<64>(L"Connected to %s", dotted(now.client))
+                                                          : jornada::wstring<64>(L"Waiting for a connection");
         jornada::wstring<96> activity = now.requests == 0 ? jornada::wstring<96>(L"No requests yet")
                                                           : jornada::format<96>(L"%u requests, last %S: %s", now.requests,
                                                                                 debugmgr::command_name(now.last_command),
@@ -98,8 +124,9 @@ public:
             area.top += line + 2;
         }
         area.top += line / 2;
-        dc.draw_text(L"Anything that can reach this port can copy files to this device and run programs. Close this window to stop.", area,
-                     DT_LEFT | DT_WORDBREAK);
+        dc.draw_text(mailbox ? L"Close this window to stop."
+                             : L"Anything that can reach this port can copy files to this device and run programs. Close this window to stop.",
+                     area, DT_LEFT | DT_WORDBREAK);
     }
 
     bool on_message(UINT message, WPARAM wparam, LPARAM lparam, LRESULT &result) {
@@ -128,6 +155,7 @@ public:
 private:
     shared_status &status;
     uint16_t port;
+    bool mailbox;
     jornada::wstring<96> addresses;
 };
 
@@ -135,6 +163,7 @@ struct server_context {
     shared_status *status;
     HWND window;
     uint16_t port;
+    bool mailbox;
 };
 
 void record(void *context, const debugmgr::report &happened) {
@@ -167,7 +196,9 @@ void record(void *context, const debugmgr::report &happened) {
 DWORD WINAPI run_server(void *parameter) {
     server_context &server = *static_cast<server_context *>(parameter);
     debugmgr::ce_device device;
-    if (debugmgr::serve(server.port, device, _WIN32_WCE, record, &server)) {
+    bool finished = server.mailbox ? debugmgr::serve_mailbox(device, _WIN32_WCE, record, &server)
+                                   : debugmgr::serve(server.port, device, _WIN32_WCE, record, &server);
+    if (finished) {
         PostMessageW(server.window, WM_CLOSE, 0, 0);
     }
     return 0;
@@ -176,6 +207,7 @@ DWORD WINAPI run_server(void *parameter) {
 }
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE previous, LPWSTR command_line, int show) {
+    bool mailbox = command_line_selects_mailbox(command_line) || registry_selects_mailbox();
     long requested_port = _wtol(command_line);
     uint16_t port = requested_port > 0 && requested_port < 65536 ? static_cast<uint16_t>(requested_port) : debugmgr::default_port;
 
@@ -187,7 +219,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE previous, LPWSTR command_line, 
 
     shared_status status;
     InitializeCriticalSection(&status.lock);
-    status_window window(status, port);
+    status_window window(status, port, mailbox);
     RECT area = jornada::work_area_rect();
     int left = area.left + (area.right - area.left - window_width) / 2;
     int top = area.top + (area.bottom - area.top - window_height) / 2;
@@ -196,7 +228,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE previous, LPWSTR command_line, 
         return 1;
     }
 
-    server_context server{&status, window.handle(), port};
+    server_context server{&status, window.handle(), port, mailbox};
     HANDLE thread = CreateThread(nullptr, 0, run_server, &server, 0, nullptr);
     if (!thread) {
         return 1;
