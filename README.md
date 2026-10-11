@@ -26,7 +26,6 @@ cmake --build build
 - Import libraries (`jornada::<dll>`) come from the Jornada 720 ROM's export tables (`exports/ce3`). `coredll` is always linked.
 - `windows.h` gives the Win32 API, plus the C runtime that coredll exports (stdio, math, `malloc`, `printf`, `setjmp`). Everything is checked against the Handheld PC 2000 SDK headers.
 - C++20 without exceptions or RTTI, with a header-only layer in `include/jornada/cxx` (see its README), and the C++ standard library (below).
-- `vscode/settings.json` sets up IntelliSense through CMake Tools.
 
 ## C++ standard library
 
@@ -52,6 +51,18 @@ In an emulator, debugmgr can use the emulator's host mailbox instead of TCP: sta
 
 It also has `get`, `ls`, `rm`, `mkdir`, `rmdir`, `mv`, `quit` and `handover`. `kill` ends any process, not just ones debugmgr started. Anything that can reach the port can copy files to the device and run programs, so only leave it running on a network you trust. The protocol is in `debugmgr/PROTOCOL.md`.
 
+## GDB and VS Code
+
+Each executable gets a GDB script beside its `.elf`, `<name>.elf.gdb`. It loads the symbols, sets the program to run as `\Windows\<name>.exe`, and defines `jornada-load`, which uploads the `.exe` and the project's DLLs to `\Windows` through debugmgr.
+
+jornada-72x-emu's GDB stub serves these. `tools/jornada-emulator` starts it (`JORNADA_EMU` names its folder) on the PPP gateway with GDB on port 2720 and the agent socket at `build/debugmgr/agent.sock`. Start PC Link on the Jornada and the emulator installs debugmgr, then:
+
+```sh
+gdb -x build/ce3/hello/hello.elf.gdb -ex "target extended-remote :2720" -ex jornada-load -ex "break WinMain" -ex run
+```
+
+For VS Code, copy `vscode/launch.json`, `vscode/tasks.json` and `vscode/settings.json` into a project's `.vscode` and set `JORNADA_TOOLCHAIN` to this folder. The settings have IntelliSense take include paths from CMake Tools. Debugging needs the C/C++ and CMake Tools extensions, a `Debug` build, and `gdb` with ARM support (Homebrew's `gdb` on macOS, `gdb-multiarch` on Linux). The emulator has no hardware watchpoints, so GDB uses software ones.
+
 ## Make
 
 - `make examples`: build `examples/` into `build/ce3`
@@ -65,7 +76,7 @@ It also has `get`, `ls`, `rm`, `mkdir`, `rmdir`, `mv`, `quit` and `handover`. `k
 
 ## Status
 
-Builds and checks pass. Nothing has run on a device or emulator yet.
+Builds and checks pass. debugmgr and GDB debugging work in jornada-72x-emu. Nothing has run on a device yet.
 
 ## Licence
 

@@ -1,0 +1,36 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Jornada 720 emulator",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${command:cmake.launchTargetPath}",
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "targetArchitecture": "arm",
+            "miDebuggerPath": "gdb",
+            "linux": {
+                "miDebuggerPath": "gdb-multiarch"
+            },
+            "preLaunchTask": "jornada: emulator",
+            "miDebuggerServerAddress": "localhost:2720",
+            "useExtendedRemote": true,
+            "customLaunchSetupCommands": [
+                {
+                    "text": "source ${command:cmake.launchTargetPath}.gdb"
+                },
+                {
+                    "text": "target extended-remote localhost:2720"
+                },
+                {
+                    "text": "-gdb-set target-wide-charset UTF-16LE"
+                },
+                {
+                    "text": "jornada-load"
+                }
+            ],
+            "launchCompleteCommand": "exec-run"
+        }
+    ]
+}

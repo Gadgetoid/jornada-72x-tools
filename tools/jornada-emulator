@@ -1,0 +1,38 @@
+#!/usr/bin/env python3
+import argparse
+import os
+import socket
+import sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DEFAULT_PORT = 2720
+AGENT_SOCKET = os.path.join(ROOT, "build", "debugmgr", "agent.sock")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Start jornada-72x-emu (JORNADA_EMU) on the PPP gateway, with its GDB stub and debugmgr mailbox")
+    parser.add_argument("--gdb", type=int, default=DEFAULT_PORT, help="GDB port, default %d" % DEFAULT_PORT)
+    parser.add_argument("--state", help="state file, default the emulator's own")
+    arguments = parser.parse_args()
+    folder = os.environ.get("JORNADA_EMU")
+    if not folder:
+        sys.exit("jornada-emulator: error: set JORNADA_EMU to the jornada-72x-emu folder")
+    program = os.path.join(folder, "jornada720")
+    if not os.access(program, os.X_OK):
+        sys.exit("jornada-emulator: error: no %s; run make in %s" % (program, folder))
+    print("jornada-emulator: starting on GDB port %d" % arguments.gdb, flush=True)
+    probe = socket.socket()
+    probe.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    try:
+        probe.bind(("127.0.0.1", arguments.gdb))
+    except OSError:
+        print("gdb: listening on 127.0.0.1:%d (already running)" % arguments.gdb, flush=True)
+        sys.exit(0)
+    finally:
+        probe.close()
+    os.makedirs(os.path.dirname(AGENT_SOCKET), exist_ok=True)
+    command = [program, "--net", "--gdb=%d" % arguments.gdb, "--agent=%s" % AGENT_SOCKET]
+    if arguments.state:
+        command.append("--state=%s" % os.path.abspath(arguments.state))
+    os.chdir(folder)
+    os.execv(program, command)

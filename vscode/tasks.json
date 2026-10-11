@@ -1,0 +1,23 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "jornada: emulator",
+            "type": "process",
+            "command": "${env:JORNADA_TOOLCHAIN}/tools/jornada-emulator",
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "jornada",
+                "pattern": {
+                    "regexp": "^jornada-emulator: error: (.*)$",
+                    "message": 1
+                },
+                "background": {
+                    "activelyMatching": true,
+                    "beginsPattern": "^jornada-emulator: starting",
+                    "endsPattern": "^gdb: listening on "
+                }
+            }
+        }
+    ]
+}
