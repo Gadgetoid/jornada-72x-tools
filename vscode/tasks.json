@@ -15,7 +15,7 @@
                 "background": {
                     "activelyMatching": true,
                     "beginsPattern": "^jornada-emulator: starting",
-                    "endsPattern": "^gdb: listening on "
+                    "endsPattern": "^(debugmgr: ready|gdb: listening on .* \\(already running\\))"
                 }
             }
         }

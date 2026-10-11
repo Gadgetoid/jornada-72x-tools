@@ -55,7 +55,7 @@ It also has `get`, `ls`, `rm`, `mkdir`, `rmdir`, `mv`, `quit` and `handover`. `k
 
 Each executable gets a GDB script beside its `.elf`, `<name>.elf.gdb`. It loads the symbols, sets the program to run as `\Windows\<name>.exe`, and defines `jornada-load`, which uploads the `.exe` and the project's DLLs to `\Windows` through debugmgr.
 
-jornada-72x-emu's GDB stub serves these. `tools/jornada-emulator` starts it (`JORNADA_EMU` names its folder) on the PPP gateway with GDB on port 2720 and the agent socket at `build/debugmgr/agent.sock`. Start PC Link on the Jornada and the emulator installs debugmgr, then:
+jornada-72x-emu's GDB stub serves these. `tools/jornada-emulator` starts it (`JORNADA_EMU` names its folder) on the PPP gateway with GDB on port 2720 and the agent socket at `build/debugmgr/agent.sock`. PC Link connects by itself and the emulator installs debugmgr, printing `debugmgr: ready`, then:
 
 ```sh
 gdb -x build/ce3/hello/hello.elf.gdb -ex "target extended-remote :2720" -ex jornada-load -ex "break WinMain" -ex run
