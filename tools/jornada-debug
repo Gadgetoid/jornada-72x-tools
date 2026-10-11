@@ -136,7 +136,8 @@ class Agent:
         self.request(COMMAND_KILL, struct.pack("<I", process))
 
     def list(self, folder):
-        pattern = ce_path(folder).rstrip("\\") + "\\*"
+        path = ce_path(folder)
+        pattern = path if "*" in path or "?" in path else path.rstrip("\\") + "\\*"
         reply = self.request(COMMAND_LIST, encode_string(pattern))
         count = struct.unpack_from("<I", reply)[0]
         position = 4
@@ -171,7 +172,7 @@ if __name__ == "__main__":
     command.add_argument("arguments", nargs=argparse.REMAINDER)
     command = commands.add_parser("kill", help="end a program started with run")
     command.add_argument("process", type=lambda text: int(text, 0))
-    command = commands.add_parser("ls", help="list a folder")
+    command = commands.add_parser("ls", help="list a folder, or the files matching a pattern such as /Windows/*.exe")
     command.add_argument("folder", nargs="?", default="\\")
     for name, help_text in (("rm", "delete a file"), ("mkdir", "create a folder"), ("rmdir", "remove a folder")):
         command = commands.add_parser(name, help=help_text)

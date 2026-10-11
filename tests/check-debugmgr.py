@@ -93,6 +93,10 @@ def run(checker, port, sandbox, work):
 
     output = checker.tool("ls", "/Windows")
     checker.expect("payload.bin  100000" in output, "ls: %r" % output)
+    open(os.path.join(sandbox, "Windows", "other.txt"), "w").write("x")
+    output = checker.tool("ls", "\\Windows\\pay*")
+    checker.expect("payload.bin  100000" in output and "other.txt" not in output, "ls with a pattern: %r" % output)
+    os.remove(os.path.join(sandbox, "Windows", "other.txt"))
 
     checker.tool("mv", "/Windows/payload.bin", "/Windows/moved.bin")
     checker.expect(os.path.exists(os.path.join(sandbox, "Windows", "moved.bin")), "mv didn't move the file")
