@@ -62,7 +62,18 @@ sudo bridge/install.sh
 
 A udev rule starts `jornada-link@ttyUSB0` when the dock connects and stops it when it's unplugged. It answers the device's `CLIENT` greeting and runs `pppd`, with the host at 192.168.131.102 and the device at 192.168.131.201. `jornada-desktop` answers PC Link's desktop connection, without which it gives up with "Communications Error". Set `JORNADA_HOST_ADDRESS` and `JORNADA_DEVICE_ADDRESS` in `/etc/default/jornada-bridge` to change the addresses.
 
-Start PC Link on the device with the USB connection. Nothing is routed between the link and other networks; from another computer, tunnel through the bridge's host:
+Start PC Link on the device with the USB connection.
+
+On macOS, a serial cable works instead, through `/usr/sbin/pppd`, which needs root. PC Link only starts once DTR is raised, which `pppd` does:
+
+```sh
+python3 bridge/jornada-desktop --address 192.168.131.102 &
+sudo pppd /dev/cu.usbserial-10 57600 nodetach noauth local nocrtscts nodefaultroute lcp-echo-interval 0 \
+    connect "$(which python3) $PWD/bridge/jornada-handshake" 192.168.131.102:192.168.131.201
+```
+
+Then start PC Link on the device within 20 seconds.
+ Nothing is routed between the link and other networks; from another computer, tunnel through the bridge's host:
 
 ```sh
 ssh -N -L 2100:192.168.131.201:2100 pi

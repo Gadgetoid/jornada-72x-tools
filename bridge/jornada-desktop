@@ -1,14 +1,18 @@
 #!/usr/bin/env python3
 import argparse
+import errno
 import socket
 import struct
+import sys
 import threading
+import time
 
 DESKTOP_PORT = 5679
 PING = 0x12345678
 PACKET_MAX = 512
 PING_SECONDS = 1
-IP_FREEBIND = getattr(socket, "IP_FREEBIND", 15)
+IP_FREEBIND = getattr(socket, "IP_FREEBIND", 15 if sys.platform.startswith("linux") else None)
+BIND_RETRY_SECONDS = 1
 
 
 def describe(packet):
@@ -62,8 +66,16 @@ def main():
     arguments = parser.parse_args()
     listener = socket.socket()
     listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    listener.setsockopt(socket.SOL_IP, IP_FREEBIND, 1)
-    listener.bind((arguments.address, DESKTOP_PORT))
+    if IP_FREEBIND is not None:
+        listener.setsockopt(socket.SOL_IP, IP_FREEBIND, 1)
+    while True:
+        try:
+            listener.bind((arguments.address, DESKTOP_PORT))
+            break
+        except OSError as error:
+            if error.errno != errno.EADDRNOTAVAIL:
+                raise
+            time.sleep(BIND_RETRY_SECONDS)
     listener.listen(4)
     print("jornada-desktop: listening on %s port %d" % (arguments.address, DESKTOP_PORT), flush=True)
     while True:
