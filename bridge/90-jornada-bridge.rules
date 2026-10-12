@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", KERNEL=="ttyUSB*", DRIVERS=="ipaq", TAG+="systemd", ENV{SYSTEMD_WANTS}+="jornada-link@%k.service"

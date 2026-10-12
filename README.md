@@ -51,6 +51,24 @@ In an emulator, debugmgr can use the emulator's host mailbox instead of TCP: sta
 
 It also has `get`, `ls`, `rm`, `mkdir`, `rmdir`, `mv`, `quit` and `handover`. `kill` ends any process, not just ones debugmgr started. Anything that can reach the port can copy files to the device and run programs, so only leave it running on a network you trust. The protocol is in `debugmgr/PROTOCOL.md`.
 
+## Connecting a device over USB
+
+A Jornada 720's dock has a USB sync port, which Linux's `ipaq` driver turns into a serial port. macOS has no driver for it. `bridge/` sets up a Linux machine, such as a Raspberry Pi, to answer PC Link when the device is plugged in, giving it an address with PPP:
+
+```sh
+sudo apt install ppp
+sudo bridge/install.sh
+```
+
+A udev rule starts `jornada-link@ttyUSB0` when the dock connects and stops it when it's unplugged. It answers the device's `CLIENT` greeting and runs `pppd`, with the host at 192.168.131.102 and the device at 192.168.131.201. `jornada-desktop` answers PC Link's desktop connection, without which it gives up with "Communications Error". Set `JORNADA_HOST_ADDRESS` and `JORNADA_DEVICE_ADDRESS` in `/etc/default/jornada-bridge` to change the addresses.
+
+Start PC Link on the device with the USB connection. Nothing is routed between the link and other networks; from another computer, tunnel through the bridge's host:
+
+```sh
+ssh -N -L 2100:192.168.131.201:2100 pi
+tools/jornada-debug --device 127.0.0.1:2100 ping
+```
+
 ## GDB and VS Code
 
 Each executable gets a GDB script beside its `.elf`, `<name>.elf.gdb`. It loads the symbols, sets the program to run as `\Windows\<name>.exe`, and defines `jornada-load`, which uploads the `.exe` and the project's DLLs to `\Windows` through debugmgr.
@@ -76,7 +94,7 @@ For VS Code, copy `vscode/launch.json`, `vscode/tasks.json` and `vscode/settings
 
 ## Status
 
-Builds and checks pass. debugmgr and GDB debugging work in jornada-72x-emu. Nothing has run on a device yet.
+Builds and checks pass. debugmgr and GDB debugging work in jornada-72x-emu. Programs run on a Jornada 720 through debugmgr over the USB bridge.
 
 ## Licence
 

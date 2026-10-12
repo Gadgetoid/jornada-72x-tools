@@ -1,0 +1,13 @@
+[Unit]
+Description=PPP link to a Windows CE device on %I
+BindsTo=dev-%i.device
+After=dev-%i.device
+
+[Service]
+Type=simple
+Environment=JORNADA_HOST_ADDRESS=192.168.131.102
+Environment=JORNADA_DEVICE_ADDRESS=192.168.131.201
+EnvironmentFile=-/etc/default/jornada-bridge
+ExecStart=/usr/sbin/pppd /dev/%I 115200 nodetach noauth local nocrtscts nodefaultroute noipv6 lcp-echo-interval 0 \
+    connect /usr/local/lib/jornada-bridge/jornada-handshake \
+    ${JORNADA_HOST_ADDRESS}:${JORNADA_DEVICE_ADDRESS}

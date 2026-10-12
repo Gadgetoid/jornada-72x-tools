@@ -1,0 +1,14 @@
+[Unit]
+Description=Desktop side of PC Link for Windows CE devices
+After=network.target
+
+[Service]
+Type=simple
+Environment=JORNADA_HOST_ADDRESS=192.168.131.102
+EnvironmentFile=-/etc/default/jornada-bridge
+ExecStart=/usr/local/lib/jornada-bridge/jornada-desktop --address ${JORNADA_HOST_ADDRESS}
+DynamicUser=yes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
