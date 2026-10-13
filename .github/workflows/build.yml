@@ -15,6 +15,9 @@ jobs:
           - runner: macos-latest
             llvm: macos-arm64
     runs-on: ${{ matrix.runner }}
+    defaults:
+      run:
+        shell: bash
     env:
       JORNADA_LLVM_RELEASE: v3
     steps:
