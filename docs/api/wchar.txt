@@ -20,6 +20,19 @@ in base 10.
 @param radix Number base.
 @return buffer.
 
+## _snwprintf(buffer, count, format)
+Formats wide-character output into a buffer, storing no more than count
+characters.
+
+The terminating null is appended unless count is zero or the formatted
+length is at least count. A truncated result returns a negative value.
+
+@param buffer Receives the formatted output.
+@param count Maximum number of wide characters to store.
+@param format Wide-character format-control string.
+@return Characters stored excluding the null terminator, or a negative
+        value if the output does not fit.
+
 ## _ultow(value, buffer, radix)
 Converts an unsigned long to a null-terminated wide string in the given base.
 

@@ -6,7 +6,31 @@
 extern "C" {
 #endif
 
+/**
+ * Displays a RAS device configuration dialog and returns edited settings.
+ *
+ * This is the RASCNTL_DEVCONFIGDIALOGEDIT control operation.
+ *
+ * @param szDeviceName Device name.
+ * @param szDeviceType Device type.
+ * @param hWndOwner Owner window for the dialog.
+ * @param lpDeviceConfigIn Existing device configuration data.
+ * @param dwSize Size of the input configuration data, in bytes.
+ * @param lpDeviceConfigOut Receives the resulting device configuration.
+ * @return Zero on success, or a RAS error code.
+ */
 DWORD RasDevConfigDialogEditW(LPCWSTR szDeviceName, LPCWSTR szDeviceType, HWND hWndOwner, LPVOID lpDeviceConfigIn, DWORD dwSize, LPVARSTRING lpDeviceConfigOut);
+/**
+ * Retrieves the display phone number for a RAS phonebook entry.
+ *
+ * This is the RASCNTL_GETDISPPHONE control operation.
+ *
+ * @param szPhonebook Phonebook name.
+ * @param szEntry Phonebook entry name.
+ * @param szPhoneNum Receives the display phone number.
+ * @param dwPhoneNumLen Output buffer capacity, in characters.
+ * @return Zero on success, or a RAS error code.
+ */
 DWORD RasGetDispPhoneNumW(LPCWSTR szPhonebook, LPCWSTR szEntry, LPWSTR szPhoneNum, DWORD dwPhoneNumLen);
 struct _RAS_STATS;
 typedef struct _RAS_STATS RAS_STATS;

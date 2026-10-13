@@ -75,17 +75,40 @@ typedef struct UserNotificationTrigger {
  * Deletes a pending user notification set with CeSetUserNotification.
  *
  * Has no effect on notifications that have already fired: use
- * CeHandleAppNotifications for those. Windows CE 1.0 has
- * PegClearUserNotification instead.
+ * CeHandleAppNotifications for those.
  *
  * @param hNotification Handle from CeSetUserNotification.
  * @return TRUE on success, FALSE on failure.
  */
 BOOL CeClearUserNotification (HANDLE hNotification); 
+/**
+ * Retrieves notification information associated with a notification handle.
+ *
+ * `pcBytesNeeded` receives the required buffer size in bytes. OEM support
+ * may vary.
+ *
+ * @param hNotification Notification handle.
+ * @param cBufferSize Size of `pBuffer`, in bytes.
+ * @param pcBytesNeeded Receives the required size, in bytes.
+ * @param pBuffer Receives the notification information.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL CeGetUserNotification (HANDLE hNotification,
 		DWORD cBufferSize,
 		LPDWORD pcBytesNeeded,
 		LPBYTE pBuffer);
+/**
+ * Retrieves handles for currently stored user notifications.
+ *
+ * Counts are numbers of handles, not byte sizes. Pass NULL and zero for
+ * `rghNotifications` and `cHandles` to query the required count. OEM
+ * support may vary.
+ *
+ * @param rghNotifications Receives notification handles.
+ * @param cHandles Capacity of the handle array.
+ * @param pcHandlesNeeded Receives the number of handles required.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL CeGetUserNotificationHandles (HANDLE* rghNotifications,
 		DWORD cHandles,
 		LPDWORD pcHandlesNeeded);
@@ -93,8 +116,7 @@ BOOL CeGetUserNotificationHandles (HANDLE* rghNotifications,
  * Shows the notification options dialog and returns the user's choices.
  *
  * The dialog only offers options the hardware supports. Store the result
- * and pass it to CeSetUserNotification. Windows CE 1.0 has
- * PegGetUserNotificationPreferences instead.
+ * and pass it to CeSetUserNotification.
  *
  * @param hWndParent Owner window for the dialog.
  * @param lpNotification CE_USER_NOTIFICATION with the initial settings.
@@ -108,7 +130,6 @@ BOOL CeGetUserNotificationPreferences (HWND hWndParent,
  * Marks all fired notifications owned by an application as handled.
  *
  * Stops the sound, LED and vibration and removes the taskbar annunciator.
- * Windows CE 1.0 has PegHandleAppNotifications instead.
  *
  * @param pwszAppName The owner name passed to CeSetUserNotification.
  * @return TRUE on success, FALSE on failure.
@@ -120,16 +141,16 @@ BOOL CeHandleAppNotifications (wchar_t *pwszAppName);
  * The application is started with a command line beginning with an
  * APP_RUN_* string matching the event, such as APP_RUN_AFTER_SYNC, and
  * sometimes followed by a parameter. If an instance is already running,
- * the new one should hand over to it and exit. Windows CE 1.0 has
- * PegRunAppAtEvent instead.
+ * the new one should hand over to it and exit. Use sparingly: unexpected
+ * programs confuse users and use memory.
  *
  * @param pwszAppName Path of the application to start.
  * @param lWhichEvent NOTIFICATION_EVENT_SYNC_END, _DEVICE_CHANGE,
- *        _RS232_DETECTED, _TIME_CHANGE or _RESTORE_END, or
- *        NOTIFICATION_EVENT_NONE to remove all of the application's
- *        registrations. NOTIFICATION_EVENT_ON_AC_POWER, _OFF_AC_POWER,
- *        _NET_CONNECT, _NET_DISCONNECT and _IR_DISCOVERED are not
- *        supported.
+ *        _RS232_DETECTED, _TIME_CHANGE, _TZ_CHANGE, _WAKEUP or
+ *        _RESTORE_END, or NOTIFICATION_EVENT_NONE to remove all of the
+ *        application's registrations. NOTIFICATION_EVENT_ON_AC_POWER,
+ *        _OFF_AC_POWER, _NET_CONNECT, _NET_DISCONNECT and _IR_DISCOVERED
+ *        are not supported.
  * @return TRUE on success, FALSE on failure.
  */
 BOOL CeRunAppAtEvent (wchar_t *pwszAppName, LONG lWhichEvent); 
@@ -138,8 +159,7 @@ BOOL CeRunAppAtEvent (wchar_t *pwszAppName, LONG lWhichEvent);
  *
  * Replaces any earlier request for the same application. The application
  * gets APP_RUN_AT_TIME as its command line. If an instance is already
- * running, the new one should hand over to it and exit. Windows CE 1.0
- * has PegRunAppAtTime instead.
+ * running, the new one should hand over to it and exit.
  *
  * @param pwszAppName Path of the application to start.
  * @param lpTime Local time to start it, or NULL to cancel the request.
@@ -150,11 +170,14 @@ BOOL CeRunAppAtTime (wchar_t *pwszAppName, SYSTEMTIME* lpTime);
  * Creates or replaces a user notification (sound, LED, dialog and so on)
  * due at a given time.
  *
+ * CeSetUserNotificationEx supersedes it and is the one to use for new
+ * code.
+ *
  * The application isn't started when the notification fires. If the user
  * picks the annunciator, a new instance starts with a command line of
  * APP_RUN_TO_HANDLE_NOTIFICATION followed by the notification handle. Get
- * the options from the user with CeGetUserNotificationPreferences.
- * Windows CE 1.0 has PegSetUserNotification instead.
+ * the options from the user with CeGetUserNotificationPreferences. Delete
+ * a pending notification with CeClearUserNotification.
  *
  * @param hNotification Notification to replace, or 0 to create one.
  * @param pwszAppName Owning application. Its icon is used as the taskbar
@@ -168,6 +191,16 @@ HANDLE CeSetUserNotification (HANDLE hNotification,
 		wchar_t *pwszAppName,
 		SYSTEMTIME* lpTime,
 		PCE_USER_NOTIFICATION lpUserNotification); 
+/**
+ * Creates a user notification or modifies an existing one.
+ *
+ * Set `hNotification` to zero to add a notification. OEM support may vary.
+ *
+ * @param hNotification Existing notification handle, or zero to add one.
+ * @param pcnt Trigger describing the event that activates the notification.
+ * @param pceun Defines the system response when the notification occurs.
+ * @return Notification handle on success, or NULL on failure.
+ */
 HANDLE CeSetUserNotificationEx (HANDLE hNotification,
 		CE_NOTIFICATION_TRIGGER *pcnt,
 		CE_USER_NOTIFICATION* pceun);

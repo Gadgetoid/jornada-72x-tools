@@ -36,6 +36,22 @@ HRESULT CreateErrorInfo(ICreateErrorInfo **pperrinfo);
  * @return S_OK, or an error code.
  */
 HRESULT CreateTypeLib2(SYSKIND syskind, LPCOLESTR szFile, ICreateTypeLib2 **ppctlib);
+/**
+ * Calls a function through a vtable entry for a customized IDispatch::Invoke.
+ *
+ * The helper provides machine-independent calling conventions for the
+ * custom invocation.
+ *
+ * @param pvInstance Instance whose vtable contains the function.
+ * @param oVft Vtable offset of the function.
+ * @param cc Calling convention.
+ * @param vtReturn Return VARTYPE.
+ * @param cActuals Number of arguments.
+ * @param prgvt VARTYPE of each argument.
+ * @param prgpvarg Pointers to the argument VARIANTARG values.
+ * @param pvargResult Receives the result VARIANT.
+ * @return HRESULT indicating success or failure.
+ */
 HRESULT DispCallFunc(void *pvInstance, ULONG oVft, CALLCONV cc, VARTYPE vtReturn, UINT cActuals, VARTYPE *prgvt, VARIANTARG **prgpvarg, VARIANT *pvargResult);
 /**
  * Maps member and parameter names to DISPIDs using interface type information.

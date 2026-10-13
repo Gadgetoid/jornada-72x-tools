@@ -10,7 +10,7 @@ extern "C" {
  * Commits a local file to the Internet cache under a URL.
  * This ANSI string variant follows the CE behavior of `CommitUrlCacheEntryW` and uses ANSI text.
  *
- * Use the local file name returned by CreateUrlCacheEntryW. Supply at
+ * Use the local file name returned by CreateUrlCacheEntryA. Supply at
  * least "HTTP/1.0 200 OK\r\n\r\n" in the headers for entries consumed
  * by WinInet. Set dwReserved to zero.
  *
@@ -50,7 +50,7 @@ BOOL CommitUrlCacheEntryW(LPCWSTR lpszUrlName, LPCWSTR lpszLocalFileName, FILETI
  * This ANSI string variant follows the CE behavior of `CreateUrlCacheEntryW` and uses ANSI text.
  *
  * The output buffer should hold MAX_PATH characters. Write the data to
- * the returned file, then commit it with CommitUrlCacheEntryW. Set
+ * the returned file, then commit it with CommitUrlCacheEntryA. Set
  * dwReserved to zero.
  *
  * @param lpszUrlName Unique source URL, without escape characters.
@@ -203,7 +203,7 @@ HANDLE FindFirstUrlCacheEntryW(LPCWSTR lpszUrlSearchPattern, LPINTERNET_CACHE_EN
  * If the entry buffer is too small, the size parameter receives the
  * required byte count.
  *
- * @param hEnumHandle Enumeration handle from FindFirstUrlCacheEntryW.
+ * @param hEnumHandle Enumeration handle from FindFirstUrlCacheEntryA.
  * @param lpNextCacheEntryInfo Receives the next entry.
  * @param lpdwNextCacheEntryInfoBufferSize Input size and output bytes
  *        copied or required.
@@ -216,7 +216,7 @@ BOOL FindNextUrlCacheEntryA(HANDLE hEnumHandle, LPINTERNET_CACHE_ENTRY_INFOA lpN
  *
  * Set reserved parameters to NULL. Call FindCloseUrlCache when done.
  *
- * @param hEnumHandle Enumeration handle from FindFirstUrlCacheEntryExW.
+ * @param hEnumHandle Enumeration handle from FindFirstUrlCacheEntryExA.
  * @param lpFirstCacheEntryInfo Receives the next entry.
  * @param lpdwFirstCacheEntryInfoBufferSize Input size and output bytes
  *        copied or required.
@@ -260,10 +260,10 @@ typedef LPVOID HINTERNET;
  * This ANSI string variant follows the CE behavior of `FtpCreateDirectoryW` and uses ANSI text.
  *
  * The directory may be relative to the server's current directory or a
- * qualified path. Use FtpGetCurrentDirectoryW rather than assuming the
+ * qualified path. Use FtpGetCurrentDirectoryA rather than assuming the
  * server's directory layout. The SDK lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszDirectory Remote directory to create.
  * @return TRUE on success, FALSE on failure; use GetLastError.
  */
@@ -287,7 +287,7 @@ BOOL FtpCreateDirectoryW(HINTERNET hConnect, LPCWSTR lpszDirectory);
  * The name may be relative to the server's current directory or qualified.
  * The SDK lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszFileName Remote file to delete.
  * @return TRUE on success, FALSE on failure; use GetLastError.
  */
@@ -307,11 +307,11 @@ BOOL FtpDeleteFileW(HINTERNET hConnect, LPCWSTR lpszFileName);
  * Starts enumerating files and directories in an FTP directory.
  * This ANSI string variant follows the CE behavior of `FtpFindFirstFileW` and uses ANSI text.
  *
- * Use InternetFindNextFileW to continue and InternetCloseHandle to end the
+ * Use InternetFindNextFileA to continue and InternetCloseHandle to end the
  * search. Only one enumeration can be active per FTP session. The SDK
  * lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszSearchFile File or directory pattern, or NULL for current directory.
  * @param lpFindFileData Receives the first entry.
  * @param dwFlags Cache and transfer options.
@@ -342,7 +342,7 @@ HINTERNET FtpFindFirstFileW(HINTERNET hConnect, LPCWSTR lpszSearchFile, LPWIN32_
  * too small, the length parameter receives the required size. The SDK
  * lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszCurrentDirectory Receives the remote directory.
  * @param lpdwCurrentDirectory Input buffer size and output characters
  *        copied or required.
@@ -368,10 +368,10 @@ BOOL FtpGetCurrentDirectoryW(HINTERNET hConnect, LPWSTR lpszCurrentDirectory, LP
  * This ANSI string variant follows the CE behavior of `FtpGetFileW` and uses ANSI text.
  *
  * Binary transfer is the default; select ASCII for text translation.
- * Use FtpOpenFileW with InternetReadFile for direct control over a
+ * Use FtpOpenFileA with InternetReadFile for direct control over a
  * transfer. The SDK lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszRemoteFile Remote file to retrieve.
  * @param lpszNewFile Local file to create.
  * @param fFailIfExists TRUE to fail if the local file exists.
@@ -406,7 +406,7 @@ BOOL FtpGetFileW(HINTERNET hConnect, LPCWSTR lpszRemoteFile, LPCWSTR lpszNewFile
  * be open per FTP session; close the returned handle with InternetCloseHandle.
  * The SDK lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszFileName Remote file name.
  * @param dwAccess GENERIC_READ or GENERIC_WRITE, not both.
  * @param dwFlags Transfer type and cache options.
@@ -433,10 +433,10 @@ HINTERNET FtpOpenFileW(HINTERNET hConnect, LPCWSTR lpszFileName, DWORD dwAccess,
  * Uploads a local file to an FTP server.
  * This ANSI string variant follows the CE behavior of `FtpPutFileW` and uses ANSI text.
  *
- * Use FtpOpenFileW and InternetWriteFile for direct transfer control.
+ * Use FtpOpenFileA and InternetWriteFile for direct transfer control.
  * The SDK lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszLocalFile Local file to send.
  * @param lpszNewRemoteFile Remote file to create.
  * @param dwFlags Transfer type and cache options.
@@ -462,10 +462,10 @@ BOOL FtpPutFileW(HINTERNET hConnect, LPCWSTR lpszLocalFile, LPCWSTR lpszNewRemot
  * Removes a directory from an FTP server.
  * This ANSI string variant follows the CE behavior of `FtpRemoveDirectoryW` and uses ANSI text.
  *
- * Use FtpGetCurrentDirectoryW rather than assuming the server's directory
+ * Use FtpGetCurrentDirectoryA rather than assuming the server's directory
  * layout. The SDK lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszDirectory Remote directory to remove.
  * @return TRUE on success, FALSE on failure; use GetLastError.
  */
@@ -488,7 +488,7 @@ BOOL FtpRemoveDirectoryW(HINTERNET hConnect, LPCWSTR lpszDirectory);
  * The names may be relative to the server's current directory or qualified.
  * The SDK lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszExisting Current remote file name.
  * @param lpszNew New remote file name.
  * @return TRUE on success, FALSE on failure; use GetLastError.
@@ -510,10 +510,10 @@ BOOL FtpRenameFileW(HINTERNET hConnect, LPCWSTR lpszExisting, LPCWSTR lpszNew);
  * Changes the current directory for an FTP session.
  * This ANSI string variant follows the CE behavior of `FtpSetCurrentDirectoryW` and uses ANSI text.
  *
- * Use FtpGetCurrentDirectoryW to query the server's actual current path.
+ * Use FtpGetCurrentDirectoryA to query the server's actual current path.
  * The SDK lists Inetftp.dll only for Intel x86.
  *
- * @param hConnect FTP session from InternetConnectW.
+ * @param hConnect FTP session from InternetConnectA.
  * @param lpszDirectory Directory to select.
  * @return TRUE on success, FALSE on failure; use GetLastError.
  */
@@ -598,7 +598,7 @@ BOOL GetUrlCacheEntryInfoW(LPCWSTR lpszUrlName, LPINTERNET_CACHE_ENTRY_INFOW lpC
  * Terminate each header with CR-LF. Use HTTP_ADDREQ_FLAG_* to append,
  * replace or coalesce headers.
  *
- * @param hRequest Open request from HttpOpenRequestW.
+ * @param hRequest Open request from HttpOpenRequestA.
  * @param lpszHeaders Header lines to add.
  * @param dwHeadersLength Header length in characters, or -1 for a
  *        null-terminated string.
@@ -623,7 +623,7 @@ BOOL HttpAddRequestHeadersW(HINTERNET hRequest, LPCWSTR lpszHeaders, DWORD dwHea
 struct _INTERNET_BUFFERSA;
 typedef struct _INTERNET_BUFFERSA *LPINTERNET_BUFFERSA;
 /**
- * Finishes a request started with HttpSendRequestExW.
+ * Finishes a request started with HttpSendRequestExA.
  * This ANSI string variant follows the CE behavior of `HttpEndRequestW` and uses ANSI text.
  *
  * @param hRequest Request handle.
@@ -653,7 +653,7 @@ BOOL HttpEndRequestW(HINTERNET hRequest, LPINTERNET_BUFFERSW lpBuffersOut, DWORD
  * InternetCloseHandle to close the request. WinInet requests complete
  * synchronously on CE.
  *
- * @param hConnect HTTP session from InternetConnectW.
+ * @param hConnect HTTP session from InternetConnectA.
  * @param lpszVerb Request method, or NULL for GET.
  * @param lpszObjectName Target path or object.
  * @param lpszVersion HTTP version, or NULL for HTTP/1.0.
@@ -738,9 +738,9 @@ BOOL HttpSendRequestA(HINTERNET hRequest, LPCSTR lpszHeaders, DWORD dwHeadersLen
  * Begins sending a request body, including chunked transfers.
  * This ANSI string variant follows the CE behavior of `HttpSendRequestExW` and uses ANSI text.
  *
- * Use HttpEndRequestW to finish the operation.
+ * Use HttpEndRequestA to finish the operation.
  *
- * @param hRequest Request handle from HttpOpenRequestW.
+ * @param hRequest Request handle from HttpOpenRequestA.
  * @param lpBuffersIn Optional input buffers.
  * @param lpBuffersOut Optional output buffers.
  * @param dwFlags HSR_* transfer flags.
@@ -860,7 +860,7 @@ typedef WORD INTERNET_PORT;
  * InternetCloseHandle to close the session. Requests complete
  * synchronously on CE.
  *
- * @param hInternet Internet session from InternetOpenW.
+ * @param hInternet Internet session from InternetOpenA.
  * @param lpszServerName Host name or dotted-decimal address.
  * @param nServerPort Service port, or INTERNET_INVALID_PORT_NUMBER for default.
  * @param lpszUserName User name, or NULL for the service default.
@@ -1028,7 +1028,7 @@ DWORD InternetErrorDlg(HWND hWnd, HINTERNET hRequest, DWORD dwError, DWORD dwFla
  * For FTP, lpvFindData receives WIN32_FIND_DATA. FALSE with
  * ERROR_NO_MORE_FILES indicates the enumeration is complete.
  *
- * @param hFind Enumeration handle from FtpFindFirstFileW or a directory URL.
+ * @param hFind Enumeration handle from FtpFindFirstFileA or a directory URL.
  * @param lpvFindData Receives the next entry.
  * @return TRUE on success, FALSE on failure; use GetLastError.
  */
@@ -1160,7 +1160,7 @@ HINTERNET InternetOpenA(LPCSTR lpszAgent, DWORD dwAccessType, LPCSTR lpszProxy, 
  * entries, then close the handle with InternetCloseHandle. Operations
  * complete synchronously on CE.
  *
- * @param hInternet Session from InternetOpenW.
+ * @param hInternet Session from InternetOpenA.
  * @param lpszUrl FTP, HTTP or HTTPS URL.
  * @param lpszHeaders Optional HTTP headers.
  * @param dwHeadersLength Header length in characters, or -1 for
@@ -1258,6 +1258,19 @@ BOOL InternetQueryOptionW(HINTERNET hInternet, DWORD dwOption, LPVOID lpBuffer, 
  * @return TRUE on success, FALSE on failure; use GetLastError.
  */
 BOOL InternetReadFile(HINTERNET hFile, LPVOID lpBuffer, DWORD dwNumberOfBytesToRead, LPDWORD lpdwNumberOfBytesRead);
+/**
+ * Reads data from a handle opened by InternetOpenUrl, FtpOpenFile or HttpOpenRequest.
+ *
+ * `IRF_ASYNC`, `IRF_SYNC` and `IRF_USE_CONTEXT` match the corresponding
+ * WinInet API flags. `IRF_NO_WAIT` returns available data without waiting.
+ * OEM support may vary.
+ *
+ * @param hFile Handle returned by InternetOpenUrl, FtpOpenFile or HttpOpenRequest.
+ * @param lpBuffersOut Receives downloaded data in an INTERNET_BUFFERSA structure.
+ * @param dwFlags Flags controlling the read.
+ * @param dwContext Context value for asynchronous operations.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL InternetReadFileExA(HINTERNET hFile, LPINTERNET_BUFFERSA lpBuffersOut, DWORD dwFlags, DWORD dwContext);
 /**
  * Sets a cookie associated with a URL.
@@ -1502,7 +1515,7 @@ BOOL SetUrlCacheEntryInfoA(LPCSTR lpszUrlName, LPINTERNET_CACHE_ENTRY_INFOA lpCa
  */
 BOOL SetUrlCacheEntryInfoW(LPCWSTR lpszUrlName, LPINTERNET_CACHE_ENTRY_INFOW lpCacheEntryInfo, DWORD dwFieldControl);
 /**
- * Unlocks a cache entry file retrieved by RetrieveUrlCacheEntryFileW.
+ * Unlocks a cache entry file retrieved by RetrieveUrlCacheEntryFileA.
  * This ANSI string variant follows the CE behavior of `UnlockUrlCacheEntryFileW` and uses ANSI text.
  *
  * Do not access the file after unlocking. The cache manager may delete it.

@@ -53,6 +53,28 @@ them first.
 @return MMSYSERR_NOERROR, or an error such as WAVERR_STILLPLAYING or
         MMSYSERR_INVALHANDLE.
 
+## waveInGetDevCaps(uDeviceID, pwic, cbwic)
+Retrieves the capabilities of a waveform-audio input device.
+
+`uDeviceID` may be a device index, WAVE_MAPPER, or an open input-device
+handle. The function copies at most `cbwic` bytes. OEM support may vary.
+
+@param uDeviceID Input device identifier or handle.
+@param pwic Receives the WAVEINCAPS structure.
+@param cbwic Size of the structure buffer, in bytes.
+@return MMSYSERR_NOERROR or an MMSYSERR_* error.
+
+## waveInGetErrorText(mmrError, pszText, cchText)
+Retrieves text for a waveform-audio input error code.
+
+The output is null-terminated and truncated if the buffer is too small.
+OEM support may vary.
+
+@param mmrError Error code to describe.
+@param pszText Receives the error text.
+@param cchText Output capacity in characters.
+@return MMSYSERR_NOERROR or an MMSYSERR_* error.
+
 ## waveInGetID(hwi, puDeviceID)
 Gets the device identifier of an open waveform input device.
 
@@ -175,6 +197,28 @@ them first.
 @return MMSYSERR_NOERROR, or an error such as WAVERR_STILLPLAYING or
         MMSYSERR_INVALHANDLE.
 
+## waveOutGetDevCaps(uDeviceID, pwoc, cbwoc)
+Retrieves the capabilities of a waveform-audio output device.
+
+`uDeviceID` may be a device index, WAVE_MAPPER, or an open output-device
+handle. The function copies at most `cbwoc` bytes. OEM support may vary.
+
+@param uDeviceID Output device identifier or handle.
+@param pwoc Receives the WAVEOUTCAPS structure.
+@param cbwoc Size of the structure buffer, in bytes.
+@return MMSYSERR_NOERROR or an MMSYSERR_* error.
+
+## waveOutGetErrorText(mmrError, pszText, cchText)
+Retrieves text for a waveform-audio output error code.
+
+The output is null-terminated and truncated if the buffer is too small.
+OEM support may vary.
+
+@param mmrError Error code to describe.
+@param pszText Receives the error text.
+@param cchText Output capacity in characters.
+@return MMSYSERR_NOERROR or an MMSYSERR_* error.
+
 ## waveOutGetID(hwo, puDeviceID)
 Gets the device identifier of an open waveform output device.
 
@@ -220,18 +264,19 @@ another and changes wType. The position resets to 0 on waveOutReset.
 @return MMSYSERR_NOERROR, or an error such as MMSYSERR_INVALHANDLE.
 
 ## waveOutGetVolume(hwo, pdwVolume)
-Gets the volume of the waveform output device.
+Gets the volume of a waveform output device.
 
-Windows CE supports only the default output device and ignores hwo.
-On Windows CE 1.0 this parameter is a device identifier rather than a
-handle. Returns the full 16-bit values last set, even if the hardware
-uses fewer bits.
+Returns the full 16-bit values last set with waveOutSetVolume, even if
+the hardware uses fewer bits. Check WAVECAPS_VOLUME and WAVECAPS_LRVOLUME
+in WAVEOUTCAPS.dwSupport (waveOutGetDevCaps) for volume support.
 
-@param hwo Ignored. Pass NULL.
+@param hwo An open device handle, for that instance only, or a device
+       identifier, for all instances of the device.
 @param pdwVolume Receives the volume: left channel in the low word,
        right in the high word, 0x0000 silent to 0xFFFF full. A mono
        device uses only the low word.
-@return MMSYSERR_NOERROR, or MMSYSERR_NOTSUPPORTED.
+@return MMSYSERR_NOERROR, or MMSYSERR_INVALHANDLE, MMSYSERR_NODRIVER,
+        MMSYSERR_NOMEM or MMSYSERR_NOTSUPPORTED.
 
 ## waveOutMessage(hwo, uMsg, dw1, dw2)
 Sends a message directly to a waveform output driver.
@@ -322,18 +367,19 @@ don't support it.
 @return MMSYSERR_NOERROR, or MMSYSERR_NOTSUPPORTED or another error.
 
 ## waveOutSetVolume(hwo, dwVolume)
-Sets the volume of the waveform output device.
+Sets the volume of a waveform output device.
 
-Windows CE supports only the default output device and ignores hwo.
-On Windows CE 1.0 this parameter is a device identifier rather than a
-handle. Volume is logarithmic. Hardware may use only the top bits of
-each value.
+Volume is logarithmic. Most hardware uses only the top few bits of each
+value. Check WAVECAPS_VOLUME and WAVECAPS_LRVOLUME in
+WAVEOUTCAPS.dwSupport (waveOutGetDevCaps) for volume support.
 
-@param hwo Ignored. Pass NULL.
+@param hwo An open device handle, for that instance only, or a device
+       identifier, for all instances of the device.
 @param dwVolume Left channel in the low word, right in the high word,
        0x0000 silent to 0xFFFF full. A mono device uses only the low
        word.
-@return MMSYSERR_NOERROR, or MMSYSERR_NOTSUPPORTED.
+@return MMSYSERR_NOERROR, or MMSYSERR_INVALHANDLE, MMSYSERR_NODRIVER,
+        MMSYSERR_NOMEM or MMSYSERR_NOTSUPPORTED.
 
 ## waveOutUnprepareHeader(hwo, pwh, cbwh)
 Undoes waveOutPrepareHeader on a buffer.

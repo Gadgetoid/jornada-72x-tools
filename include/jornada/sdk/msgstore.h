@@ -6,40 +6,279 @@
 extern "C" {
 #endif
 
+/**
+ * Closes a message-store context.
+ *
+ * @param hMail Message-store context.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailClose(HANDLE hMail);
 struct MailMsg_s;
 typedef struct MailMsg_s MailMsg;
+/**
+ * Removes a message from the message store.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message to delete.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailDelete(HANDLE hMail, MailMsg *pmm);
 struct MailAtt_s;
 typedef struct MailAtt_s MailAtt;
+/**
+ * Deletes an attachment from a message.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message containing the attachment.
+ * @param pma Attachment to delete.
+ * @param fFullDelete Whether to delete the attachment header as well.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailDeleteAttachment(HANDLE hMail, MailMsg *pmm, MailAtt *pma, BOOL fFullDelete);
+/**
+ * Retrieves the last message-store error or warning.
+ *
+ * Negative values indicate errors, positive values warnings, and zero no
+ * error.
+ *
+ * @param hMail Message-store context.
+ * @return Last message-store error or warning value.
+ */
 int MailError(HANDLE hMail);
+/**
+ * Retrieves printable text for the last message-store error.
+ *
+ * @param hMail Message-store context.
+ * @param szBuf Receives the error text.
+ * @param iBufLen Buffer capacity, in characters.
+ * @param piSrcLine Optionally receives the source line of the error.
+ * @return Last message-store error value.
+ */
 int MailErrorMsg(HANDLE hMail, LPWSTR szBuf, int iBufLen, int *piSrcLine);
+/**
+ * Retrieves the first message in the message store.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Receives the message.
+ * @return TRUE on success, FALSE when no message is available or on failure.
+ */
 BOOL MailFirst(HANDLE hMail, MailMsg *pmm);
+/**
+ * Releases storage returned for a previously retrieved message.
+ *
+ * @param pmm Message whose storage to release.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailFree(MailMsg *pmm);
+/**
+ * Retrieves a message from the message store.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Receives the message.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailGet(HANDLE hMail, MailMsg *pmm);
+/**
+ * Retrieves an attachment for a message.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message containing the attachment.
+ * @param pma Receives the attachment data.
+ */
 INT MailGetAttachment(HANDLE hMail, MailMsg *pmm, MailAtt *pma);
+/**
+ * Retrieves a header field from a message.
+ *
+ * Set `fGetName` to retrieve the field name position rather than its value.
+ *
+ * @param pmm Message to read.
+ * @param szName Header field name.
+ * @param fGetName Selects the field-name position instead of its value.
+ * @return Pointer to the requested header field.
+ */
 LPWSTR MailGetField(MailMsg *pmm, LPWSTR szName, BOOL fGetName);
+/**
+ * Finds a folder ID by folder name.
+ *
+ * @param hMail Message-store context.
+ * @param pbId Receives the folder ID.
+ * @param szName Folder name to match.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailGetFolderId(HANDLE hMail, BYTE *pbId, LPWSTR szName);
+/**
+ * Retrieves a folder name by folder ID.
+ *
+ * `piId` supplies the folder ID and receives the next used ID, or -1.
+ * `piLen` supplies the buffer capacity and receives the required character
+ * count including the terminator. Set `szName` to NULL to query the size.
+ *
+ * @param hMail Message-store context.
+ * @param piId Input folder ID and output next used ID.
+ * @param piLen Input capacity and output required count.
+ * @param szName Receives the folder name, or NULL to query its size.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailGetFolderName(HANDLE hMail, int *piId, int *piLen, LPWSTR szName);
 struct _MAILSORTINFO;
 typedef struct _MAILSORTINFO *PMAILSORTINFO;
+/**
+ * Retrieves message-list sort order and direction.
+ *
+ * @param hMail Message-store context.
+ * @param pInfo Receives sort field, direction and message count.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailGetSort(HANDLE hMail, PMAILSORTINFO pInfo);
+/**
+ * Retrieves a message object ID using its service name and ID.
+ *
+ * The message object ID and status flags are returned in `pmm`.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message whose service identifiers are used and object ID is set.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailGetSvcId(HANDLE hMail, MailMsg *pmm);
+/**
+ * Computes the character count of a message's header string.
+ *
+ * @param pmm Message whose headers to measure.
+ * @return Header length in characters.
+ */
 DWORD MailHeaderLen(MailMsg *pmm);
+/**
+ * Retrieves the local attachment length associated with a message.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message whose attachment length to retrieve.
+ * @return Local attachment length.
+ */
 DWORD MailLocalAttachmentLen(HANDLE hMail, MailMsg *pmm);
+/**
+ * Retrieves the next message after the message in `pmm`.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Previous message on input; receives the next message.
+ * @return TRUE on success, FALSE when no message is available or on failure.
+ */
 BOOL MailNext(HANDLE hMail, MailMsg *pmm);
+/**
+ * Opens the message store and returns its context handle.
+ *
+ * @param phMail Receives the message-store context.
+ * @param fAllowCreate Allows creation of the message-store directory and database.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailOpen(HANDLE *phMail, BOOL fAllowCreate);
+/**
+ * Opens the message store and enables database notifications to a window.
+ *
+ * @param phMail Receives the message-store context.
+ * @param fAllowCreate Allows creation of the message-store directory and database.
+ * @param hwndNotify Window that receives database notifications.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailOpenNotify(HANDLE *phMail, BOOL fAllowCreate, HWND hwndNotify);
+/**
+ * Creates a message-store entry from a message structure.
+ *
+ * The `dwMsgId` member is ignored when storing a new message.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message data to store.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailPut(HANDLE hMail, MailMsg *pmm);
+/**
+ * Creates an attachment for a message.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message that receives the attachment.
+ * @param pma Attachment data to store.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailPutAttachment(HANDLE hMail, MailMsg *pmm, MailAtt *pma);
+/**
+ * Sets a folder name; a NULL name deletes the folder.
+ *
+ * @param hMail Message-store context.
+ * @param bId Folder ID.
+ * @param szName New folder name, or NULL to delete the folder.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailPutFolder(HANDLE hMail, BYTE bId, LPWSTR szName);
+/**
+ * Reads extra properties, such as schedule information, from a message.
+ *
+ * The returned property array is allocated; release it with LocalFree.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message to read.
+ * @param ppPropVal Receives the allocated property array.
+ * @param pcPropVal Receives the number of properties.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailReadNonIPMProperties(HANDLE hMail, MailMsg *pmm, CEPROPVAL **ppPropVal, WORD *pcPropVal);
+/**
+ * Closes a registry key used by message-store emulation or RPC support.
+ *
+ * @param hKey Registry key handle.
+ * @return Zero on success, or a registry error code.
+ */
 LONG MailRegCloseKey(HKEY hKey);
+/**
+ * Enumerates a subkey for message-store emulation or RPC support.
+ *
+ * @param hKey Registry key handle.
+ * @param dwIndex Subkey index.
+ * @param lpName Receives the subkey name.
+ * @param lpcbName Input name-buffer size and output name length.
+ * @param lpReserved Reserved; set to NULL.
+ * @param lpClass Receives the class string, if present.
+ * @param lpcbClass Input class-buffer size and output class length.
+ * @param lpftLastWriteTime Optionally receives the last-write time.
+ * @return Zero on success, or a registry error code.
+ */
 LONG MailRegEnumKeyExW(HKEY hKey, DWORD dwIndex, LPWSTR lpName, LPDWORD lpcbName, LPDWORD lpReserved, LPWSTR lpClass, LPDWORD lpcbClass, PFILETIME lpftLastWriteTime);
+/**
+ * Opens a Pegasus registry key for message-store emulation or RPC support.
+ *
+ * @param hKey Handle to an open key.
+ * @param lpSubKey Name of the subkey to open.
+ * @param ulOptions Reserved; set to zero.
+ * @param samDesired Requested access mask.
+ * @param phkResult Receives the opened key handle.
+ * @return Zero on success, or a registry error code.
+ */
 LONG MailRegOpenKeyExW(HKEY hKey, LPCWSTR lpSubKey, DWORD ulOptions, REGSAM samDesired, PHKEY phkResult);
+/**
+ * Requests or cancels retrieval of a message attachment.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message containing the attachment.
+ * @param pma Attachment to retrieve or cancel.
+ * @param bRetrieve TRUE to request retrieval, FALSE to cancel it.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailRequestAttachment(HANDLE hMail, MailMsg *pmm, MailAtt *pma, BOOL bRetrieve);
+/**
+ * Sets attachment options for a message.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message whose attachment options to change.
+ * @param dwFlags Attachment option flags.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailSetAttachmentOptions(HANDLE hMail, MailMsg *pmm, DWORD dwFlags);
+/**
+ * Sets a header field in a message; a NULL value deletes the field.
+ *
+ * @param pmm Message to modify.
+ * @param szName Header field name.
+ * @param szVal New field value, or NULL to delete the field.
+ * @return TRUE on success, FALSE on allocation failure.
+ */
 BOOL MailSetField(MailMsg *pmm, LPWSTR szName, LPCWSTR szVal);
 typedef enum {
     MAIL_SORT_FROM,
@@ -48,8 +287,35 @@ typedef enum {
     MAIL_SORT_SIZE
 } MAILSORTFIELD;
 
+/**
+ * Sets message-list sort order and direction.
+ *
+ * @param hMail Message-store context.
+ * @param iSort MAIL_SORT_FROM, MAIL_SORT_SUBJ, MAIL_SORT_DATE or MAIL_SORT_SIZE.
+ * @param fAscending TRUE for ascending order, FALSE for descending.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailSetSort(HANDLE hMail, MAILSORTFIELD iSort, BOOL fAscending);
+/**
+ * Updates message flags after a message has been retrieved.
+ *
+ * Set `fDoAll` to TRUE to update the other message fields as well.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message with updated flags or fields.
+ * @param fDoAll Whether to update all other fields.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailUpdate(HANDLE hMail, MailMsg *pmm, BOOL fDoAll);
+/**
+ * Writes extra properties, such as schedule information, to a message.
+ *
+ * @param hMail Message-store context.
+ * @param pmm Message to update.
+ * @param pPropVal Property array to write.
+ * @param cPropVal Number of properties in the array.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL MailWriteNonIPMProperties(HANDLE hMail, MailMsg *pmm, CEPROPVAL *pPropVal, UINT cPropVal);
 struct MailNonIpmInfo_s;
 typedef struct MailNonIpmInfo_s MailNonIpmInfo;

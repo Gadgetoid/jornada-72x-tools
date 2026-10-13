@@ -23,8 +23,9 @@ typedef struct varstring_tag {
  * Retrieves the TAPI device configuration saved for a phone-book entry with
  * RasSetEntryDevConfig.
  *
- * Call with pDeviceConfig NULL to get the size, allocate, then call again. On
- * Windows CE 2.0, prefer RasGetEntryProperties.
+ * Call with pDeviceConfig NULL to get the size, allocate, then call again.
+ * RasGetEntryPropertiesW returns the same configuration with the rest of
+ * the entry.
  *
  * @param szPhonebook Ignored; pass NULL. Entries are kept in the registry.
  * @param szEntry Name of an existing entry.
@@ -40,7 +41,8 @@ DWORD WINAPI RasGetEntryDevConfig(LPCWSTR szPhonebook, LPCWSTR szEntry, LPDWORD 
 /**
  * Saves the TAPI device configuration for a phone-book entry.
  *
- * On Windows CE 2.0, prefer RasSetEntryProperties.
+ * RasSetEntryPropertiesW can set the same configuration with the rest of
+ * the entry.
  *
  * @param szPhonebook Ignored; pass NULL. Entries are kept in the registry.
  * @param szEntry Name of an existing entry.

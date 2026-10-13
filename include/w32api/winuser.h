@@ -3542,15 +3542,13 @@ WINUSERAPI BOOL WINAPI AppendMenuA(HMENU,UINT,UINT_PTR,LPCSTR);
 /**
  * Adds an item to the end of a menu.
  *
- * Call DrawMenuBar after changing a menu. MF_MENUBREAK and
- * MF_MENUBARBREAK are unsupported on CE 1.0 and 1.01; cascading menus
- * (MF_POPUP in a popup menu) are unsupported on CE 1.0 and supported from
- * CE 2.0. MF_BITMAP, MF_DISABLED and MFS_GRAYED are unsupported; use
- * MF_GRAYED instead.
+ * Call DrawMenuBar after changing a menu. MF_POPUP items can go in a menu
+ * bar or in another popup menu to make a cascading menu. MF_BITMAP,
+ * MF_DISABLED and MFS_GRAYED are unsupported; use MF_GRAYED instead.
  *
  * @param hMenu Menu bar, drop-down menu, submenu or shortcut menu.
- * @param fuFlags MF_STRING, MF_OWNERDRAW or MF_SEPARATOR, with supported
- *        state and layout flags.
+ * @param fuFlags MF_STRING, MF_OWNERDRAW or MF_SEPARATOR, with MF_CHECKED,
+ *        MF_GRAYED, MF_ENABLED, MF_POPUP, MF_MENUBREAK or MF_MENUBARBREAK.
  * @param idNewItem Command identifier, or with MF_POPUP the submenu's HMENU.
  * @param lpszNewItem Text for MF_STRING or application data for
  *        MF_OWNERDRAW; ignored for MF_SEPARATOR.
@@ -3606,7 +3604,19 @@ WINUSERAPI long WINAPI BroadcastSystemMessageExW(DWORD,LPDWORD,UINT,WPARAM,LPARA
 #endif /* (_WIN32_WINNT >= 0x0501) */
 WINUSERAPI BOOL WINAPI CallMsgFilterA(LPMSG,INT);
 WINUSERAPI BOOL WINAPI CallMsgFilterW(LPMSG,INT);
-WINUSERAPI LRESULT WINAPI CallNextHookEx(HHOOK,int,WPARAM,LPARAM);
+/**
+ * Passes hook information to the next procedure in the current hook chain.
+ *
+ * Call this unless the hook must prevent later hooks from receiving the
+ * notification. The `hhk` parameter is ignored.
+ *
+ * @param hhk Ignored hook handle.
+ * @param nCode Hook code.
+ * @param wParam Hook-specific value.
+ * @param lParam Hook-specific value.
+ * @return Value returned by the next hook procedure.
+ */
+WINUSERAPI LRESULT WINAPI CallNextHookEx(HHOOK hhk,int nCode,WPARAM wParam,LPARAM lParam);
 WINUSERAPI LRESULT WINAPI CallWindowProcA(WNDPROC,HWND,UINT,WPARAM,LPARAM);
 /**
  * Calls a window procedure with a message.
@@ -4852,7 +4862,18 @@ WINUSERAPI UINT WINAPI GetRawInputDeviceInfoW(HANDLE,UINT,LPVOID,PUINT);
 WINUSERAPI UINT WINAPI GetRawInputDeviceList(PRAWINPUTDEVICELIST,PUINT,UINT);
 WINUSERAPI UINT WINAPI GetRegisteredRawInputDevices(PRAWINPUTDEVICE,PUINT,UINT);
 #endif
-WINUSERAPI DWORD WINAPI GetQueueStatus(UINT);
+/**
+ * Returns status bits for message types in the calling thread's queue.
+ *
+ * The high word describes message types currently in the queue; the low
+ * word describes types added since the last queue-status check or message
+ * retrieval. Treat the result as a hint, not a guarantee that GetMessage or
+ * PeekMessage will return a message.
+ *
+ * @param flags QS_* message types to check.
+ * @return High-word current status and low-word changed status.
+ */
+WINUSERAPI DWORD WINAPI GetQueueStatus(UINT flags);
 /**
  * Returns a scroll bar's range, page size and position.
  *
@@ -6342,7 +6363,15 @@ WINUSERAPI BOOL WINAPI TranslateMDISysAccel(HWND,LPMSG);
  */
 WINUSERAPI BOOL WINAPI TranslateMessage(const MSG*lpMsg);
 WINUSERAPI BOOL WINAPI UnhookWindowsHook(int,HOOKPROC);
-WINUSERAPI BOOL WINAPI UnhookWindowsHookEx(HHOOK);
+/**
+ * Removes a hook procedure installed with SetWindowsHookEx.
+ *
+ * The hook may still be executing on another thread when this call returns.
+ *
+ * @param hhk Hook handle to remove.
+ * @return TRUE on success, FALSE on failure; use GetLastError.
+ */
+WINUSERAPI BOOL WINAPI UnhookWindowsHookEx(HHOOK hhk);
 #if (WINVER >= 0x0500)
 WINUSERAPI BOOL WINAPI UnhookWinEvent(HWINEVENTHOOK);
 #endif
@@ -6518,15 +6547,13 @@ typedef MONITORINFOEXW MONITORINFOEX, *LPMONITORINFOEX;
 /**
  * Adds an item to the end of a menu.
  *
- * Call DrawMenuBar after changing a menu. MF_MENUBREAK and
- * MF_MENUBARBREAK are unsupported on CE 1.0 and 1.01; cascading menus
- * (MF_POPUP in a popup menu) are unsupported on CE 1.0 and supported from
- * CE 2.0. MF_BITMAP, MF_DISABLED and MFS_GRAYED are unsupported; use
- * MF_GRAYED instead.
+ * Call DrawMenuBar after changing a menu. MF_POPUP items can go in a menu
+ * bar or in another popup menu to make a cascading menu. MF_BITMAP,
+ * MF_DISABLED and MFS_GRAYED are unsupported; use MF_GRAYED instead.
  *
  * @param hMenu Menu bar, drop-down menu, submenu or shortcut menu.
- * @param fuFlags MF_STRING, MF_OWNERDRAW or MF_SEPARATOR, with supported
- *        state and layout flags.
+ * @param fuFlags MF_STRING, MF_OWNERDRAW or MF_SEPARATOR, with MF_CHECKED,
+ *        MF_GRAYED, MF_ENABLED, MF_POPUP, MF_MENUBREAK or MF_MENUBARBREAK.
  * @param idNewItem Command identifier, or with MF_POPUP the submenu's HMENU.
  * @param lpszNewItem Text for MF_STRING or application data for
  *        MF_OWNERDRAW; ignored for MF_SEPARATOR.

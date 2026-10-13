@@ -14,15 +14,13 @@ client area.
 ## AppendMenuW(hMenu, fuFlags, idNewItem, lpszNewItem)
 Adds an item to the end of a menu.
 
-Call DrawMenuBar after changing a menu. MF_MENUBREAK and
-MF_MENUBARBREAK are unsupported on CE 1.0 and 1.01; cascading menus
-(MF_POPUP in a popup menu) are unsupported on CE 1.0 and supported from
-CE 2.0. MF_BITMAP, MF_DISABLED and MFS_GRAYED are unsupported; use
-MF_GRAYED instead.
+Call DrawMenuBar after changing a menu. MF_POPUP items can go in a menu
+bar or in another popup menu to make a cascading menu. MF_BITMAP,
+MF_DISABLED and MFS_GRAYED are unsupported; use MF_GRAYED instead.
 
 @param hMenu Menu bar, drop-down menu, submenu or shortcut menu.
-@param fuFlags MF_STRING, MF_OWNERDRAW or MF_SEPARATOR, with supported
-       state and layout flags.
+@param fuFlags MF_STRING, MF_OWNERDRAW or MF_SEPARATOR, with MF_CHECKED,
+       MF_GRAYED, MF_ENABLED, MF_POPUP, MF_MENUBREAK or MF_MENUBARBREAK.
 @param idNewItem Command identifier, or with MF_POPUP the submenu's HMENU.
 @param lpszNewItem Text for MF_STRING or application data for
        MF_OWNERDRAW; ignored for MF_SEPARATOR.
@@ -60,6 +58,18 @@ application, use SetForegroundWindow.
 
 @param hWnd The window.
 @return Nonzero on success, or 0 on failure (see GetLastError).
+
+## CallNextHookEx(hhk, nCode, wParam, lParam)
+Passes hook information to the next procedure in the current hook chain.
+
+Call this unless the hook must prevent later hooks from receiving the
+notification. The `hhk` parameter is ignored.
+
+@param hhk Ignored hook handle.
+@param nCode Hook code.
+@param wParam Hook-specific value.
+@param lParam Hook-specific value.
+@return Value returned by the next hook procedure.
 
 ## CallWindowProcW(wndprcPrev, hwnd, uMsg, wParam, lParam)
 Calls a window procedure with a message.
@@ -982,6 +992,17 @@ Returns the first format in a list that the clipboard has data for.
 @param cFormats Number of entries in the list.
 @return The first available format, 0 if the clipboard is empty, or -1 if
         it holds data in none of the listed formats.
+
+## GetQueueStatus(flags)
+Returns status bits for message types in the calling thread's queue.
+
+The high word describes message types currently in the queue; the low
+word describes types added since the last queue-status check or message
+retrieval. Treat the result as a hint, not a guarantee that GetMessage or
+PeekMessage will return a message.
+
+@param flags QS_* message types to check.
+@return High-word current status and low-word changed status.
 
 ## GetScrollInfo(hwnd, fnBar, lpsi)
 Returns a scroll bar's range, page size and position.
@@ -2113,6 +2134,14 @@ aren't set.
 
 @param lpMsg Message from GetMessageW or PeekMessageW.
 @return TRUE if a character message was posted, FALSE otherwise.
+
+## UnhookWindowsHookEx(hhk)
+Removes a hook procedure installed with SetWindowsHookEx.
+
+The hook may still be executing on another thread when this call returns.
+
+@param hhk Hook handle to remove.
+@return TRUE on success, FALSE on failure; use GetLastError.
 
 ## UnionRect(lprcDst, lprcSrc1, lprcSrc2)
 Computes the smallest rectangle containing two rectangles.

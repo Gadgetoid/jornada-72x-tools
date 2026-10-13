@@ -7,6 +7,14 @@
 extern "C" {
 #endif
 
+/**
+ * Initializes the HTML viewer control.
+ *
+ * Load `Htmlview.dll` before calling this function. OEM support may vary.
+ *
+ * @param hinst Application instance used to create the DISPLAYCLASS window.
+ * @return TRUE on success, FALSE on failure.
+ */
 BOOL InitHTMLControl(HINSTANCE hinst);
 struct tagINLINEIMAGEINFO;
 typedef struct tagINLINEIMAGEINFO INLINEIMAGEINFO;

@@ -710,13 +710,13 @@ int PASCAL sendto(SOCKET s,const char*buf,int len,int flags,const struct sockadd
  *
  * Boolean options use an int: nonzero enables, zero disables. SO_REUSEADDR
  * only takes effect if set before bind. IPPROTO_IP supports
- * IP_MULTICAST_TTL, IP_MULTICAST_IF, IP_MULTICAST_LOOP,
- * IP_ADD_MEMBERSHIP and IP_DROP_MEMBERSHIP. Windows CE 2.0 adds
- * SO_SECURE: pass a DWORD containing SO_SEC_SSL at SOL_SOCKET before
- * connecting. For IrDA, include af_irda.h; SOL_SOCKET supports only
- * SO_LINGER, with IRLMP_IAS_SET, IRLMP_IRLPT_MODE and IRLMP_RAW_MODE
- * available at SOL_IRLMP. Set IRLMP_RAW_MODE immediately after socket,
- * before other Winsock calls.
+ * IP_MULTICAST_TTL, IP_MULTICAST_IF, IP_ADD_MEMBERSHIP and
+ * IP_DROP_MEMBERSHIP. For SSL, pass a DWORD containing SO_SEC_SSL as
+ * SO_SECURE at SOL_SOCKET before connecting. SO_RCVLOWAT, SO_SNDLOWAT and
+ * SO_SNDTIMEO are not supported. For IrDA, include af_irda.h; SOL_SOCKET
+ * supports only SO_LINGER, with IRLMP_IAS_SET, IRLMP_IRLPT_MODE and
+ * IRLMP_RAW_MODE available at SOL_IRLMP. Set IRLMP_RAW_MODE immediately
+ * after socket, before other Winsock calls.
  *
  * @param s Socket to configure.
  * @param level SOL_SOCKET, IPPROTO_TCP, IPPROTO_IP or SOL_IRLMP.

@@ -84,8 +84,7 @@ Adds button images to a command bar from a bitmap.
 
 Images should be 16x16. For the system images, pass HINST_COMMCTRL with
 IDB_STD_SMALL_COLOR or IDB_VIEW_SMALL_COLOR, then index them with STD_* or
-VIEW_* offset by the returned index. On Windows CE 1.0 the display is 2bpp
-greyscale, so images aren't shown in colour.
+VIEW_* offset by the returned index.
 
 @param hwndCB The command bar.
 @param hInst Module containing the bitmap, HINST_COMMCTRL, or NULL if
@@ -94,11 +93,15 @@ greyscale, so images aren't shown in colour.
        a bitmap handle.
 @param iNumImages Number of images in the bitmap. May be 0 for the system
        bitmaps.
-@param iImageWidth Width of each image: 16. The CE 1.0 reference marks
-       this reserved.
-@param iImageHeight Height of each image: 16. The CE 1.0 reference marks
-       this reserved.
+@param iImageWidth Width of each image: 16.
+@param iImageHeight Height of each image: 16.
 @return Index of the first new image, or -1 on failure.
+
+## CommandBar_AlignAdornments(hwndCB)
+Lines up the command bar's adornments, the buttons added with
+CommandBar_AddAdornments, after its buttons or size change.
+
+@param hwndCB The command bar.
 
 ## CommandBar_Create(hInst, hwndParent, idCmdBar)
 Creates an empty command bar along the top of a window.
@@ -147,8 +150,7 @@ Inserts a combo box into a command bar.
 @param hInst Application instance.
 @param iWidth Width, in pixels.
 @param dwStyle Combo box and window styles. WS_CHILD and WS_VISIBLE are
-       added automatically. On Windows CE 1.0, only CBS_DROPDOWNLIST and
-       WS_VSCROLL are supported.
+       added automatically.
 @param idComboBox Control identifier.
 @param iButton Zero-based index of the button to insert it before.
 @return The combo box, or NULL on failure.
@@ -368,10 +370,10 @@ Destroy with ImageList_Destroy.
 
 @param cx Width of each image, in pixels.
 @param cy Height of each image, in pixels.
-@param flags ILC_COLOR or ILC_COLORDDB, optionally with ILC_MASK for a
-       mask. ILC_COLOR on Windows CE 1.0 is a 2bpp DIB. Windows CE 2.0
-       doesn't support ILC_COLOR4, ILC_COLOR8, ILC_COLOR16, ILC_COLOR24 or
-       ILC_COLOR32.
+@param flags One of ILC_COLOR or ILC_COLORDDB, optionally with ILC_MASK
+       for a monochrome mask. ILC_COLOR picks the display driver's
+       default, usually 4 bits per pixel, or a device-dependent bitmap
+       on older drivers.
 @param cInitial Number of images to allocate space for initially.
 @param cGrow Number of images to grow by when the list is full.
 @return The image list, or NULL on failure.
@@ -521,6 +523,22 @@ or modify the image directly, but don't delete them.
 @param pImageInfo Receives the image and mask bitmaps and the image's
        rectangle within them.
 @return TRUE on success, FALSE on failure.
+
+## ImageList_LoadImage(hi, lpbmp, cx, cGrow, crMask, uType, uFlags)
+Creates an image list from a bitmap or icon resource.
+
+`lpbmp` is a resource name, file name with `LR_LOADFROMFILE`, or an OEM
+resource identifier when `hi` is NULL. Only icons are supported, not
+cursors. `uFlags` is unsupported; set it to zero. OEM support may vary.
+
+@param hi Instance containing the image, or NULL for an OEM image.
+@param lpbmp Resource name, file name, or OEM image identifier.
+@param cx Width of each image; height is inferred from the resource.
+@param cGrow Number of images to add when the list grows.
+@param crMask Color used to create the image mask, or CLR_NONE/CLR_DEFAULT.
+@param uType IMAGE_BITMAP or IMAGE_ICON.
+@param uFlags Unsupported; set to zero.
+@return Image-list handle, or NULL on failure.
 
 ## ImageList_Merge(himl1, iImage1, himl2, iImage2, dx, dy)
 Creates a new image list holding one image made by drawing one image

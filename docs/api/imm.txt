@@ -10,6 +10,18 @@ NULL.
        association.
 @return The window's previous input context.
 
+## ImmAssociateContextEx(hWnd, hIMC, dwFlags)
+Associates an input context with a window or its child windows.
+
+Use IACE_CHILDREN for the current child windows of the calling thread;
+later-created children are unaffected. IACE_DEFAULT restores the
+window's default context and ignores `hIMC`. OEM support may vary.
+
+@param hWnd Window whose input-context association changes.
+@param hIMC Input context to associate.
+@param dwFlags IACE_CHILDREN, IACE_DEFAULT or IACE_IGNORENOCONTEXT.
+@return TRUE on success, FALSE on failure.
+
 ## ImmConfigureIMEW(hKL, hWnd, dwMode, lpData)
 Shows an IME's configuration dialog.
 
@@ -19,6 +31,47 @@ Shows an IME's configuration dialog.
        IME_CONFIG_SELECTDICTIONARY.
 @param lpData A REGISTERWORDW for IME_CONFIG_REGISTERWORD, otherwise
        NULL.
+@return TRUE on success, FALSE on failure.
+
+## ImmCreateContext()
+Creates and initializes an input method context.
+
+Destroy the context with ImmDestroyContext. OEM support may vary.
+
+@return Input-context handle, or NULL on failure.
+
+## ImmCreateIMCC(dwSize)
+Creates a zero-initialized IMC component of the specified size.
+
+OEM support may vary.
+
+@param dwSize Component size, in bytes.
+@return IMC-component handle, or zero on failure.
+
+## ImmDestroyContext(hIMC)
+Destroys an input method context and frees its associated memory.
+
+Call this for contexts created with ImmCreateContext. OEM support may
+vary.
+
+@param hIMC Input-context handle.
+@return Nonzero on success, zero on failure.
+
+## ImmDestroyIMCC(hIMCC)
+Destroys an IMC component.
+
+OEM support may vary.
+
+@param hIMCC IMC-component handle.
+@return NULL on success, or the handle on failure.
+
+## ImmDisableIME(idThread)
+Disables the IME for the current thread.
+
+Set `idThread` to zero. Call this before creating the thread's first
+top-level window. OEM support may vary.
+
+@param idThread Must be zero.
 @return TRUE on success, FALSE on failure.
 
 ## ImmEnumRegisterWordW(hKL, lpfnEnumProc, lpszReading, dwStyle, lpszRegister, lpData)
@@ -41,6 +94,15 @@ Sends an IME-specific escape to an IME.
 @param uEscape Escape code, IME_ESC_*.
 @param lpData Escape-specific data.
 @return Escape-specific, 0 on failure.
+
+## ImmGenerateMessage(hIMC)
+Posts the IME messages stored in the input context's message buffer.
+
+Typically called by an IME after changing the context without user
+keystroke activity. OEM support may vary.
+
+@param hIMC Input-context handle containing the messages.
+@return TRUE on success, FALSE on failure.
 
 ## ImmGetCandidateListCountW(hIMC, lpdwListCount)
 Gets the number of candidate lists and the buffer size needed for all
@@ -155,6 +217,63 @@ Gets the IME's error or guidance information.
 @return For GGL_LEVEL a GL_LEVEL_* value, for GGL_INDEX a GL_ID_*
         value, otherwise bytes copied or needed.
 
+## ImmGetHotKey(dwHotKeyID, lpuModifiers, lpuVKey, lphKL)
+Retrieves the modifiers, virtual key and IME associated with a hot key.
+
+CE does not support true keyboard layouts; the returned handle identifies
+the current IME and locale. OEM support may vary.
+
+@param dwHotKeyID Hot-key identifier.
+@param lpuModifiers Receives the modifier keys.
+@param lpuVKey Receives the virtual-key code.
+@param lphKL Receives the associated keyboard handle.
+@return TRUE on success, FALSE on failure.
+
+## ImmGetIMCCLockCount(hIMCC)
+Retrieves the lock count of an IMC component.
+
+@param hIMCC IMC-component handle.
+@return Component lock count.
+
+## ImmGetIMCCSize(hIMCC)
+Retrieves the size of an IMC component.
+
+@param hIMCC IMC-component handle.
+@return Component size, in bytes.
+
+## ImmGetIMCLockCount(hIMC)
+Retrieves the lock count of an input method context.
+
+@param hIMC Input-context handle.
+@return Lock count, or zero if the context is invalid.
+
+## ImmGetIMEFileNameW(hKL, lpszFileName, uBufLen)
+Retrieves the file name of the IME associated with a keyboard handle.
+
+CE uses the handle to distinguish locale-specific IMEs rather than as a
+true keyboard layout. A zero `uBufLen` queries the required size. Counts
+are in bytes and exclude the terminating null. OEM support may vary.
+
+@param hKL Handle identifying the locale-specific IME.
+@param lpszFileName Receives the file name.
+@param uBufLen Output capacity, in bytes.
+@return Bytes copied or required, excluding the terminator.
+
+## ImmGetImeMenuItemsW(hIMC, dwFlags, dwType, lpImeParentMenu, lpImeMenu, dwSize)
+Retrieves menu items registered by an IME.
+
+Set `lpImeParentMenu` to NULL for top-level items. Set `lpImeMenu` to
+NULL to query the number of registered items. `dwSize` is the size of
+each IMEMENUITEMINFOW structure. OEM support may vary.
+
+@param hIMC Input-context handle.
+@param dwFlags Menu flags, including IGIMIF_RIGHTMENU.
+@param dwType Combination of IGIMII_* menu-item types.
+@param lpImeParentMenu Optional parent submenu item.
+@param lpImeMenu Receives the menu-item array, or NULL to query the count.
+@param dwSize Size of each IMEMENUITEMINFOW structure, in bytes.
+@return Number of menu items copied, or registered when querying the count.
+
 ## ImmGetOpenStatus(hIMC)
 Returns whether the IME is open.
 
@@ -178,6 +297,29 @@ Gets the word styles an IME supports.
 @param lpStyleBuf Receives the styles.
 @return Styles copied, or the number available when nItem is 0.
 
+## ImmGetStatusWindowPos(hIMC, lpptPos)
+Retrieves the IME status-window position in screen coordinates.
+
+@param hIMC Input-context handle.
+@param lpptPos Receives the position relative to the screen's upper-left corner.
+@return Nonzero on success, zero on failure.
+
+## ImmGetVirtualKey(hWnd)
+Retrieves the original virtual key for a key message processed by the IME.
+
+Use this only when the message contains VK_PROCESSKEY.
+
+@param hWnd Window that received the key message.
+@return Original virtual-key code.
+
+## ImmIsIME(hKL)
+Checks whether a keyboard handle identifies an IME.
+
+The system validates `hKL`.
+
+@param hKL Keyboard handle to check.
+@return Nonzero if it identifies an IME, zero otherwise.
+
 ## ImmIsUIMessageW(hWndIME, msg, wParam, lParam)
 Checks whether a message is meant for the IME window, and passes it on
 if so.
@@ -187,6 +329,23 @@ if so.
 @param wParam The message's wParam.
 @param lParam The message's lParam.
 @return TRUE if the message belongs to the IME window, otherwise FALSE.
+
+## ImmLockIMC(hIMC)
+Locks an input context and returns its INPUTCONTEXT pointer.
+
+The call increments the context lock count; call ImmUnlockIMC when
+finished. OEM support may vary.
+
+@param hIMC Input-context handle.
+@return INPUTCONTEXT pointer, or NULL on failure.
+
+## ImmLockIMCC(hIMCC)
+Returns a pointer to an IMC component.
+
+Windows CE does not use the component lock count. OEM support may vary.
+
+@param hIMCC IMC-component handle.
+@return Component pointer, or NULL on failure.
 
 ## ImmNotifyIME(hIMC, dwAction, dwIndex, dwValue)
 Tells the IME about a change to an input context, or asks it to act on
@@ -220,6 +379,27 @@ Call once for every ImmGetContext.
 @param hWnd The window passed to ImmGetContext.
 @param hIMC The input context.
 @return TRUE on success, FALSE on failure.
+
+## ImmRequestMessageW(hIMC, wParam, lParam)
+Generates a WM_IME_REQUEST message for an input method.
+
+The operation and result are specified by the WM_IME_REQUEST message
+parameters.
+
+@param hIMC Input context for the request.
+@param wParam WM_IME_REQUEST operation.
+@param lParam Operation-specific value.
+@return Operation-specific result, or zero on failure.
+
+## ImmReSizeIMCC(hIMCC, dwSize)
+Changes the size of an IMC component.
+
+Use the returned handle, which may differ from the input handle. OEM
+support may vary.
+
+@param hIMCC IMC-component handle.
+@param dwSize New component size, in bytes.
+@return Resized component handle, or zero on failure.
 
 ## ImmSetCandidateWindow(hIMC, lpCandidate)
 Sets the position and style of a candidate window.
@@ -264,6 +444,18 @@ Sets the conversion and sentence modes.
 @param fdwSentence An IME_SMODE_* value.
 @return TRUE on success, FALSE on failure.
 
+## ImmSetHotKey(dwHotKeyID, uModifiers, uVKey, hKL)
+Sets an IME hot key.
+
+CE uses `hKL` to associate the hot key with an IME and locale, not a
+true keyboard layout. OEM support may vary.
+
+@param dwHotKeyID Hot-key identifier.
+@param uModifiers Modifier-key flags.
+@param uVKey Virtual-key code.
+@param hKL Handle identifying the IME and locale.
+@return TRUE on success, FALSE on failure.
+
 ## ImmSetOpenStatus(hIMC, fOpen)
 Opens or closes the IME.
 
@@ -287,6 +479,34 @@ Japanese IME open and closed.
 @param hWnd The window.
 @param dwHotKeyID The hot key, IME_JHOTKEY_CLOSE_OPEN.
 @return TRUE on success, FALSE on failure.
+
+## ImmSIPanelState(dwCmd, pValue)
+Queries or changes input-panel state and location.
+
+`dwCmd` selects the operation; `pValue` points to its command-specific
+data. The reference documents this API for Japanese builds, so do not
+assume it is implemented on other OEM images.
+
+@param dwCmd SIP_QUERY_LOCATION, SIP_QUERY_STATE, SIP_SET_LOCATION or
+       SIP_INPUT_ATTRIBUTES.
+@param pValue Command-specific input or output data.
+@return TRUE on success, FALSE on failure.
+
+## ImmUnlockIMC(hIMC)
+Reduces the lock count of an input method context.
+
+The return value is FALSE when the count reaches zero, TRUE otherwise.
+
+@param hIMC Input-context handle.
+@return FALSE if the count reaches zero, TRUE otherwise.
+
+## ImmUnlockIMCC(hIMCC)
+Reduces the lock count of an IMC component.
+
+The return value is FALSE when the count reaches zero, TRUE otherwise.
+
+@param hIMCC IMC-component handle.
+@return FALSE if the count reaches zero, TRUE otherwise.
 
 ## ImmUnregisterWordW(hKL, lpszReading, dwStyle, lpszUnregister)
 Removes a word from an IME's dictionary.

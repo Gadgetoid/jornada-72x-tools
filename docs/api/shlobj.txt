@@ -1,3 +1,11 @@
+## SHGetDesktopFolder(ppshf)
+Retrieves the IShellFolder interface for the desktop namespace root.
+
+Release the returned interface when it is no longer needed.
+
+@param ppshf Receives the desktop IShellFolder interface.
+@return S_OK on success, or an HRESULT error.
+
 ## SHGetMalloc(ppMalloc)
 Retrieves the shell's IMalloc interface.
 

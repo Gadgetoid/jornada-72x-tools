@@ -1604,39 +1604,63 @@ BOOL WINAPI PlaySoundW(LPCWSTR pszSound,HMODULE hmod,DWORD fdwSound);
  */
 UINT WINAPI waveOutGetNumDevs(void);
 MMRESULT WINAPI waveOutGetDevCapsA(UINT,LPWAVEOUTCAPSA,UINT);
-MMRESULT WINAPI _WNAME(waveOutGetDevCaps)(UINT,LPWAVEOUTCAPSW,UINT);
 /**
- * Gets the volume of the waveform output device.
+ * Retrieves the capabilities of a waveform-audio output device.
  *
- * Windows CE supports only the default output device and ignores hwo.
- * On Windows CE 1.0 this parameter is a device identifier rather than a
- * handle. Returns the full 16-bit values last set, even if the hardware
- * uses fewer bits.
+ * `uDeviceID` may be a device index, WAVE_MAPPER, or an open output-device
+ * handle. The function copies at most `cbwoc` bytes. OEM support may vary.
  *
- * @param hwo Ignored. Pass NULL.
+ * @param uDeviceID Output device identifier or handle.
+ * @param pwoc Receives the WAVEOUTCAPS structure.
+ * @param cbwoc Size of the structure buffer, in bytes.
+ * @return MMSYSERR_NOERROR or an MMSYSERR_* error.
+ */
+MMRESULT WINAPI _WNAME(waveOutGetDevCaps)(UINT uDeviceID,LPWAVEOUTCAPSW pwoc,UINT cbwoc);
+/**
+ * Gets the volume of a waveform output device.
+ *
+ * Returns the full 16-bit values last set with waveOutSetVolume, even if
+ * the hardware uses fewer bits. Check WAVECAPS_VOLUME and WAVECAPS_LRVOLUME
+ * in WAVEOUTCAPS.dwSupport (waveOutGetDevCaps) for volume support.
+ *
+ * @param hwo An open device handle, for that instance only, or a device
+ *        identifier, for all instances of the device.
  * @param pdwVolume Receives the volume: left channel in the low word,
  *        right in the high word, 0x0000 silent to 0xFFFF full. A mono
  *        device uses only the low word.
- * @return MMSYSERR_NOERROR, or MMSYSERR_NOTSUPPORTED.
+ * @return MMSYSERR_NOERROR, or MMSYSERR_INVALHANDLE, MMSYSERR_NODRIVER,
+ *         MMSYSERR_NOMEM or MMSYSERR_NOTSUPPORTED.
  */
 MMRESULT WINAPI waveOutGetVolume(HWAVEOUT hwo,PDWORD pdwVolume);
 /**
- * Sets the volume of the waveform output device.
+ * Sets the volume of a waveform output device.
  *
- * Windows CE supports only the default output device and ignores hwo.
- * On Windows CE 1.0 this parameter is a device identifier rather than a
- * handle. Volume is logarithmic. Hardware may use only the top bits of
- * each value.
+ * Volume is logarithmic. Most hardware uses only the top few bits of each
+ * value. Check WAVECAPS_VOLUME and WAVECAPS_LRVOLUME in
+ * WAVEOUTCAPS.dwSupport (waveOutGetDevCaps) for volume support.
  *
- * @param hwo Ignored. Pass NULL.
+ * @param hwo An open device handle, for that instance only, or a device
+ *        identifier, for all instances of the device.
  * @param dwVolume Left channel in the low word, right in the high word,
  *        0x0000 silent to 0xFFFF full. A mono device uses only the low
  *        word.
- * @return MMSYSERR_NOERROR, or MMSYSERR_NOTSUPPORTED.
+ * @return MMSYSERR_NOERROR, or MMSYSERR_INVALHANDLE, MMSYSERR_NODRIVER,
+ *         MMSYSERR_NOMEM or MMSYSERR_NOTSUPPORTED.
  */
 MMRESULT WINAPI waveOutSetVolume(HWAVEOUT hwo,DWORD dwVolume);
 MMRESULT WINAPI waveOutGetErrorTextA(MMRESULT,LPSTR,UINT);
-MMRESULT WINAPI _WNAME(waveOutGetErrorText)(MMRESULT,LPWSTR,UINT);
+/**
+ * Retrieves text for a waveform-audio output error code.
+ *
+ * The output is null-terminated and truncated if the buffer is too small.
+ * OEM support may vary.
+ *
+ * @param mmrError Error code to describe.
+ * @param pszText Receives the error text.
+ * @param cchText Output capacity in characters.
+ * @return MMSYSERR_NOERROR or an MMSYSERR_* error.
+ */
+MMRESULT WINAPI _WNAME(waveOutGetErrorText)(MMRESULT mmrError,LPWSTR pszText,UINT cchText);
 /**
  * Opens a waveform output device for playback.
  *
@@ -1831,9 +1855,31 @@ MMRESULT WINAPI waveOutMessage(HWAVEOUT hwo,UINT uMsg,DWORD dw1,DWORD dw2);
  */
 UINT WINAPI waveInGetNumDevs(void);
 MMRESULT WINAPI waveInGetDevCapsA(UINT,LPWAVEINCAPSA,UINT);
-MMRESULT WINAPI _WNAME(waveInGetDevCaps)(UINT,LPWAVEINCAPSW,UINT);
+/**
+ * Retrieves the capabilities of a waveform-audio input device.
+ *
+ * `uDeviceID` may be a device index, WAVE_MAPPER, or an open input-device
+ * handle. The function copies at most `cbwic` bytes. OEM support may vary.
+ *
+ * @param uDeviceID Input device identifier or handle.
+ * @param pwic Receives the WAVEINCAPS structure.
+ * @param cbwic Size of the structure buffer, in bytes.
+ * @return MMSYSERR_NOERROR or an MMSYSERR_* error.
+ */
+MMRESULT WINAPI _WNAME(waveInGetDevCaps)(UINT uDeviceID,LPWAVEINCAPSW pwic,UINT cbwic);
 MMRESULT WINAPI waveInGetErrorTextA(MMRESULT,LPSTR,UINT);
-MMRESULT WINAPI _WNAME(waveInGetErrorText)(MMRESULT,LPWSTR,UINT);
+/**
+ * Retrieves text for a waveform-audio input error code.
+ *
+ * The output is null-terminated and truncated if the buffer is too small.
+ * OEM support may vary.
+ *
+ * @param mmrError Error code to describe.
+ * @param pszText Receives the error text.
+ * @param cchText Output capacity in characters.
+ * @return MMSYSERR_NOERROR or an MMSYSERR_* error.
+ */
+MMRESULT WINAPI _WNAME(waveInGetErrorText)(MMRESULT mmrError,LPWSTR pszText,UINT cchText);
 /**
  * Opens a waveform input device for recording.
  *

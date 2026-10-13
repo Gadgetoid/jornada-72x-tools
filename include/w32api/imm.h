@@ -361,7 +361,19 @@ UINT WINAPI ImmGetDescriptionA(HKL,LPSTR,UINT);
  */
 UINT WINAPI ImmGetDescriptionW(HKL hKL,LPWSTR lpszDescription,UINT uBufLen);
 UINT WINAPI ImmGetIMEFileNameA(HKL,LPSTR,UINT);
-UINT WINAPI ImmGetIMEFileNameW(HKL,LPWSTR,UINT);
+/**
+ * Retrieves the file name of the IME associated with a keyboard handle.
+ *
+ * CE uses the handle to distinguish locale-specific IMEs rather than as a
+ * true keyboard layout. A zero `uBufLen` queries the required size. Counts
+ * are in bytes and exclude the terminating null. OEM support may vary.
+ *
+ * @param hKL Handle identifying the locale-specific IME.
+ * @param lpszFileName Receives the file name.
+ * @param uBufLen Output capacity, in bytes.
+ * @return Bytes copied or required, excluding the terminator.
+ */
+UINT WINAPI ImmGetIMEFileNameW(HKL hKL,LPWSTR lpszFileName,UINT uBufLen);
 /**
  * Gets the properties and capabilities of an IME.
  *
@@ -371,7 +383,15 @@ UINT WINAPI ImmGetIMEFileNameW(HKL,LPWSTR,UINT);
  * @return The requested property flags or value.
  */
 DWORD WINAPI ImmGetProperty(HKL hKL,DWORD fdwIndex);
-BOOL WINAPI ImmIsIME(HKL);
+/**
+ * Checks whether a keyboard handle identifies an IME.
+ *
+ * The system validates `hKL`.
+ *
+ * @param hKL Keyboard handle to check.
+ * @return Nonzero if it identifies an IME, zero otherwise.
+ */
+BOOL WINAPI ImmIsIME(HKL hKL);
 /**
  * Acts as if the user pressed an IME hot key in a window.
  *
@@ -383,8 +403,24 @@ BOOL WINAPI ImmIsIME(HKL);
  * @return TRUE on success, FALSE on failure.
  */
 BOOL WINAPI ImmSimulateHotKey(HWND hWnd,DWORD dwHotKeyID);
+/**
+ * Creates and initializes an input method context.
+ *
+ * Destroy the context with ImmDestroyContext. OEM support may vary.
+ *
+ * @return Input-context handle, or NULL on failure.
+ */
 HIMC WINAPI ImmCreateContext(void);
-BOOL WINAPI ImmDestroyContext(HIMC);
+/**
+ * Destroys an input method context and frees its associated memory.
+ *
+ * Call this for contexts created with ImmCreateContext. OEM support may
+ * vary.
+ *
+ * @param hIMC Input-context handle.
+ * @return Nonzero on success, zero on failure.
+ */
+BOOL WINAPI ImmDestroyContext(HIMC hIMC);
 /**
  * Returns the input context associated with a window.
  *
@@ -590,7 +626,14 @@ DWORD WINAPI ImmGetConversionListW(HKL hKL,HIMC hIMC,LPCWSTR lpSrc,PCANDIDATELIS
  * @return TRUE on success, FALSE on failure.
  */
 BOOL WINAPI ImmNotifyIME(HIMC hIMC,DWORD dwAction,DWORD dwIndex,DWORD dwValue);
-BOOL WINAPI ImmGetStatusWindowPos(HIMC,LPPOINT);
+/**
+ * Retrieves the IME status-window position in screen coordinates.
+ *
+ * @param hIMC Input-context handle.
+ * @param lpptPos Receives the position relative to the screen's upper-left corner.
+ * @return Nonzero on success, zero on failure.
+ */
+BOOL WINAPI ImmGetStatusWindowPos(HIMC hIMC,LPPOINT lpptPos);
 /**
  * Moves the IME status window.
  *
@@ -646,7 +689,15 @@ BOOL WINAPI ImmIsUIMessageA(HWND,UINT,WPARAM,LPARAM);
  * @return TRUE if the message belongs to the IME window, otherwise FALSE.
  */
 BOOL WINAPI ImmIsUIMessageW(HWND hWndIME,UINT msg,WPARAM wParam,LPARAM lParam);
-UINT WINAPI ImmGetVirtualKey(HWND);
+/**
+ * Retrieves the original virtual key for a key message processed by the IME.
+ *
+ * Use this only when the message contains VK_PROCESSKEY.
+ *
+ * @param hWnd Window that received the key message.
+ * @return Original virtual-key code.
+ */
+UINT WINAPI ImmGetVirtualKey(HWND hWnd);
 BOOL WINAPI ImmRegisterWordA(HKL,LPCSTR,DWORD,LPCSTR);
 /**
  * Adds a word to an IME's dictionary.
@@ -705,9 +756,33 @@ UINT WINAPI ImmEnumRegisterWordW(HKL hKL,REGISTERWORDENUMPROCW lpfnEnumProc,LPCW
  * @return TRUE on success, FALSE on failure.
  */
 BOOL WINAPI EnableEUDC(BOOL fEnableEUDC);
-BOOL WINAPI ImmDisableIME(DWORD);
+/**
+ * Disables the IME for the current thread.
+ *
+ * Set `idThread` to zero. Call this before creating the thread's first
+ * top-level window. OEM support may vary.
+ *
+ * @param idThread Must be zero.
+ * @return TRUE on success, FALSE on failure.
+ */
+BOOL WINAPI ImmDisableIME(DWORD idThread);
 DWORD WINAPI ImmGetImeMenuItemsA(HIMC,DWORD,DWORD,LPIMEMENUITEMINFOA,LPIMEMENUITEMINFOA,DWORD);
-DWORD WINAPI ImmGetImeMenuItemsW(HIMC,DWORD,DWORD,LPIMEMENUITEMINFOW,LPIMEMENUITEMINFOW,DWORD);
+/**
+ * Retrieves menu items registered by an IME.
+ *
+ * Set `lpImeParentMenu` to NULL for top-level items. Set `lpImeMenu` to
+ * NULL to query the number of registered items. `dwSize` is the size of
+ * each IMEMENUITEMINFOW structure. OEM support may vary.
+ *
+ * @param hIMC Input-context handle.
+ * @param dwFlags Menu flags, including IGIMIF_RIGHTMENU.
+ * @param dwType Combination of IGIMII_* menu-item types.
+ * @param lpImeParentMenu Optional parent submenu item.
+ * @param lpImeMenu Receives the menu-item array, or NULL to query the count.
+ * @param dwSize Size of each IMEMENUITEMINFOW structure, in bytes.
+ * @return Number of menu items copied, or registered when querying the count.
+ */
+DWORD WINAPI ImmGetImeMenuItemsW(HIMC hIMC,DWORD dwFlags,DWORD dwType,LPIMEMENUITEMINFOW lpImeParentMenu,LPIMEMENUITEMINFOW lpImeMenu,DWORD dwSize);
 
 #ifdef UNICODE
 /**
@@ -891,7 +966,34 @@ DWORD WINAPI ImmGetImeMenuItemsW(HIMC,DWORD,DWORD,LPIMEMENUITEMINFOW,LPIMEMENUIT
  *         needed when uBufLen is 0.
  */
 #define ImmGetDescription ImmGetDescriptionW
+/**
+ * Retrieves the file name of the IME associated with a keyboard handle.
+ *
+ * CE uses the handle to distinguish locale-specific IMEs rather than as a
+ * true keyboard layout. A zero `uBufLen` queries the required size. Counts
+ * are in bytes and exclude the terminating null. OEM support may vary.
+ *
+ * @param hKL Handle identifying the locale-specific IME.
+ * @param lpszFileName Receives the file name.
+ * @param uBufLen Output capacity, in bytes.
+ * @return Bytes copied or required, excluding the terminator.
+ */
 #define ImmGetIMEFileName ImmGetIMEFileNameW
+/**
+ * Retrieves menu items registered by an IME.
+ *
+ * Set `lpImeParentMenu` to NULL for top-level items. Set `lpImeMenu` to
+ * NULL to query the number of registered items. `dwSize` is the size of
+ * each IMEMENUITEMINFOW structure. OEM support may vary.
+ *
+ * @param hIMC Input-context handle.
+ * @param dwFlags Menu flags, including IGIMIF_RIGHTMENU.
+ * @param dwType Combination of IGIMII_* menu-item types.
+ * @param lpImeParentMenu Optional parent submenu item.
+ * @param lpImeMenu Receives the menu-item array, or NULL to query the count.
+ * @param dwSize Size of each IMEMENUITEMINFOW structure, in bytes.
+ * @return Number of menu items copied, or registered when querying the count.
+ */
 #define ImmGetImeMenuItems ImmGetImeMenuItemsW
 #else
 #define ImmEnumRegisterWord ImmEnumRegisterWordA

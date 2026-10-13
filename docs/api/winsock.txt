@@ -343,18 +343,27 @@ WSAEMSGSIZE and nothing is sent.
 @return Bytes sent, which may be less than len, or SOCKET_ERROR (see
         WSAGetLastError).
 
+## sethostname(pName, cName)
+Sets the device's host name, as gethostname returns it.
+
+Windows CE specific.
+
+@param pName The new host name.
+@param cName Length of pName in bytes.
+@return 0 on success, or SOCKET_ERROR (see WSAGetLastError).
+
 ## setsockopt(s, level, optname, optval, optlen)
 Sets a socket option.
 
 Boolean options use an int: nonzero enables, zero disables. SO_REUSEADDR
 only takes effect if set before bind. IPPROTO_IP supports
-IP_MULTICAST_TTL, IP_MULTICAST_IF, IP_MULTICAST_LOOP,
-IP_ADD_MEMBERSHIP and IP_DROP_MEMBERSHIP. Windows CE 2.0 adds
-SO_SECURE: pass a DWORD containing SO_SEC_SSL at SOL_SOCKET before
-connecting. For IrDA, include af_irda.h; SOL_SOCKET supports only
-SO_LINGER, with IRLMP_IAS_SET, IRLMP_IRLPT_MODE and IRLMP_RAW_MODE
-available at SOL_IRLMP. Set IRLMP_RAW_MODE immediately after socket,
-before other Winsock calls.
+IP_MULTICAST_TTL, IP_MULTICAST_IF, IP_ADD_MEMBERSHIP and
+IP_DROP_MEMBERSHIP. For SSL, pass a DWORD containing SO_SEC_SSL as
+SO_SECURE at SOL_SOCKET before connecting. SO_RCVLOWAT, SO_SNDLOWAT and
+SO_SNDTIMEO are not supported. For IrDA, include af_irda.h; SOL_SOCKET
+supports only SO_LINGER, with IRLMP_IAS_SET, IRLMP_IRLPT_MODE and
+IRLMP_RAW_MODE available at SOL_IRLMP. Set IRLMP_RAW_MODE immediately
+after socket, before other Winsock calls.
 
 @param s Socket to configure.
 @param level SOL_SOCKET, IPPROTO_TCP, IPPROTO_IP or SOL_IRLMP.

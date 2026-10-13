@@ -15,9 +15,31 @@ HRESULT CoInternetCombineUrl(LPCWSTR pwzBaseUrl, LPCWSTR pwzRelativeUrl, DWORD d
 HRESULT CoInternetCompareUrl(LPCWSTR pwzUrl1, LPCWSTR pwzUrl2, DWORD dwFlags);
 struct IInternetSecurityManager;
 typedef struct IInternetSecurityManager IInternetSecurityManager;
+/**
+ * Creates an Internet security manager.
+ *
+ * The service provider allows delegation. The reserved parameter must be
+ * zero.
+ *
+ * @param pSP Service provider for delegation.
+ * @param ppSM Receives the IInternetSecurityManager interface.
+ * @param dwReserved Reserved; set to zero.
+ * @return S_OK on success, or an HRESULT error.
+ */
 HRESULT CoInternetCreateSecurityManager(IServiceProvider *pSP, IInternetSecurityManager **ppSM, DWORD dwReserved);
 struct IInternetZoneManager;
 typedef struct IInternetZoneManager IInternetZoneManager;
+/**
+ * Creates an Internet zone manager.
+ *
+ * The service provider allows delegation. The reserved parameter must be
+ * zero.
+ *
+ * @param pSP Service provider for delegation.
+ * @param ppZM Receives the IInternetZoneManager interface.
+ * @param dwReserved Reserved; set to zero.
+ * @return S_OK on success, or an HRESULT error.
+ */
 HRESULT CoInternetCreateZoneManager(IServiceProvider *pSP, IInternetZoneManager **ppZM, DWORD dwReserved);
 enum _tagPSUACTION {
     PSU_DEFAULT = 1,

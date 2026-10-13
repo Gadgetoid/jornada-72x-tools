@@ -376,6 +376,20 @@ int vfprintf(FILE *stream, const char *format, va_list arguments);
  *         a negative value on error.
  */
 int vsprintf(char *buffer, const char *format, va_list arguments);
+/**
+ * Formats output into a buffer using a va_list, storing no more than count
+ * bytes.
+ *
+ * The terminating null is appended unless count is zero or the formatted
+ * length is at least count. A truncated result returns a negative value.
+ *
+ * @param buffer Receives the formatted output.
+ * @param count Maximum number of bytes to store.
+ * @param format Format-control string.
+ * @param arguments Argument list.
+ * @return Bytes stored excluding the null terminator, or a negative value
+ *         if the output does not fit.
+ */
 int _vsnprintf(char *buffer, size_t count, const char *format, va_list arguments);
 int snprintf(char *buffer, size_t count, const char *format, ...);
 int remove(const char *path);
@@ -517,6 +531,13 @@ int wprintf(const wchar_t *format, ...);
  * @return Number of wide characters written, or a negative value on error.
  */
 int fwprintf(FILE *stream, const wchar_t *format, ...);
+/**
+ * Writes formatted wide-character output to stdout using a va_list.
+ *
+ * @param format Wide-character format-control string.
+ * @param arguments Argument list.
+ * @return Number of wide characters written, or a negative value on error.
+ */
 int vwprintf(const wchar_t *format, va_list arguments);
 /**
  * Writes formatted wide-character output to a stream using a va_list.

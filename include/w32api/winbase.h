@@ -1553,12 +1553,14 @@ WINBASEAPI HANDLE WINAPI CreateFileW(LPCWSTR lpFileName,DWORD dwDesiredAccess,DW
  *
  * Windows CE specific. Use this instead of CreateFileW for files to be
  * mapped: the kernel opens the file, so other processes can share the
- * mapping. Don't use the handle for ReadFile or WriteFile.
+ * mapping. Don't use the handle for ReadFile or WriteFile. Once passed to
+ * CreateFileMappingW the kernel owns the handle and CloseHandle on it
+ * fails. Only one process should open a shared file this way; others map
+ * it by name with CreateFileMappingW.
  *
  * @param lpFileName Path of the file, up to MAX_PATH characters.
  * @param dwDesiredAccess GENERIC_READ, GENERIC_READ | GENERIC_WRITE, or 0
- *        for attribute queries. The Windows CE 2.0 reference lists only
- *        0 and GENERIC_READ.
+ *        for attribute queries.
  * @param dwShareMode 0, FILE_SHARE_READ and/or FILE_SHARE_WRITE.
  * @param lpSecurityAttributes Must be NULL.
  * @param dwCreationDisposition CREATE_NEW, CREATE_ALWAYS, OPEN_EXISTING,
@@ -1644,18 +1646,19 @@ WINBASEAPI BOOL WINAPI CreateProcessA(LPCSTR,LPSTR,LPSECURITY_ATTRIBUTES,LPSECUR
  *
  * Close both handles in lpProcessInformation with CloseHandle when no
  * longer needed. There are no priority classes, environment blocks or
- * current directories.
+ * current directories. Don't call it from DllMain. HKEY_LOCAL_MACHINE\Loader
+ * SystemPath adds search folders, after a reset.
  *
- * @param lpApplicationName The module to run. Must not be NULL, and the
- *        module can't be named in lpCommandLine instead. Without a path,
- *        the root of a PC Card, \Windows and \ are searched. .exe is
- *        assumed if there is no extension.
+ * @param lpApplicationName The module to run. Must not be NULL. Without a
+ *        path, \Windows, then \, then an OEM-dependent folder are searched.
+ *        .exe is assumed if there is no extension.
  * @param lpCommandLine Arguments, or NULL.
  * @param lpProcessAttributes Must be NULL.
  * @param lpThreadAttributes Must be NULL.
  * @param bInheritHandles Must be FALSE.
- * @param dwCreationFlags 0 or CREATE_SUSPENDED. Windows CE 2.0 also
- *        supports DEBUG_PROCESS and DEBUG_ONLY_THIS_PROCESS.
+ * @param dwCreationFlags 0, CREATE_SUSPENDED, CREATE_NEW_CONSOLE,
+ *        DEBUG_PROCESS or DEBUG_ONLY_THIS_PROCESS. With the debug flags,
+ *        only the calling thread can call WaitForDebugEvent.
  * @param lpEnvironment Must be NULL.
  * @param lpCurrentDirectory Must be NULL.
  * @param lpStartupInfo Must be NULL.
@@ -1733,7 +1736,7 @@ WINBASEAPI BOOL WINAPI DeactivateActCtx(DWORD,ULONG_PTR);
  * Then receive events with WaitForDebugEvent: CREATE_PROCESS_DEBUG_EVENT
  * for the primary thread and CREATE_THREAD_DEBUG_EVENT for each other
  * thread. Close the thread handles they carry. No initial breakpoint is
- * raised. Windows CE 2.0 can also launch a just-in-time debugger named by
+ * raised. A just-in-time debugger can be registered as
  * the JITDebugger value under HKEY_LOCAL_MACHINE\Debug, after a warm
  * reset; it gets the process ID on its command line.
  *
@@ -2383,7 +2386,17 @@ WINBASEAPI BOOL WINAPI GetPrivateProfileStructA(LPCSTR,LPCSTR,LPVOID,UINT,LPCSTR
 WINBASEAPI BOOL WINAPI GetPrivateProfileStructW(LPCWSTR,LPCWSTR,LPVOID,UINT,LPCWSTR);
 #ifdef _WIN32_WCE
 #if (_WIN32_WCE >= 0x300)
-WINBASEAPI FARPROC WINAPI GetProcAddressA(HINSTANCE,LPCSTR);
+/**
+ * Returns the address of an exported function using an ANSI export name.
+ *
+ * The name must match the DLL's export spelling and case. An ordinal may be
+ * passed in the low word with the high word set to zero.
+ *
+ * @param hModule Module handle.
+ * @param lpProcName ANSI export name or ordinal.
+ * @return Function address, or NULL on failure; see GetLastError.
+ */
+WINBASEAPI FARPROC WINAPI GetProcAddressA(HINSTANCE hModule,LPCSTR lpProcName);
 #endif
 /**
  * Returns the address of a function exported by a DLL.
@@ -4094,12 +4107,14 @@ typedef PCACTCTXW PCACTCTX;
  *
  * Windows CE specific. Use this instead of CreateFileW for files to be
  * mapped: the kernel opens the file, so other processes can share the
- * mapping. Don't use the handle for ReadFile or WriteFile.
+ * mapping. Don't use the handle for ReadFile or WriteFile. Once passed to
+ * CreateFileMappingW the kernel owns the handle and CloseHandle on it
+ * fails. Only one process should open a shared file this way; others map
+ * it by name with CreateFileMappingW.
  *
  * @param lpFileName Path of the file, up to MAX_PATH characters.
  * @param dwDesiredAccess GENERIC_READ, GENERIC_READ | GENERIC_WRITE, or 0
- *        for attribute queries. The Windows CE 2.0 reference lists only
- *        0 and GENERIC_READ.
+ *        for attribute queries.
  * @param dwShareMode 0, FILE_SHARE_READ and/or FILE_SHARE_WRITE.
  * @param lpSecurityAttributes Must be NULL.
  * @param dwCreationDisposition CREATE_NEW, CREATE_ALWAYS, OPEN_EXISTING,
@@ -4166,18 +4181,19 @@ typedef PCACTCTXW PCACTCTX;
  *
  * Close both handles in lpProcessInformation with CloseHandle when no
  * longer needed. There are no priority classes, environment blocks or
- * current directories.
+ * current directories. Don't call it from DllMain. HKEY_LOCAL_MACHINE\Loader
+ * SystemPath adds search folders, after a reset.
  *
- * @param lpApplicationName The module to run. Must not be NULL, and the
- *        module can't be named in lpCommandLine instead. Without a path,
- *        the root of a PC Card, \Windows and \ are searched. .exe is
- *        assumed if there is no extension.
+ * @param lpApplicationName The module to run. Must not be NULL. Without a
+ *        path, \Windows, then \, then an OEM-dependent folder are searched.
+ *        .exe is assumed if there is no extension.
  * @param lpCommandLine Arguments, or NULL.
  * @param lpProcessAttributes Must be NULL.
  * @param lpThreadAttributes Must be NULL.
  * @param bInheritHandles Must be FALSE.
- * @param dwCreationFlags 0 or CREATE_SUSPENDED. Windows CE 2.0 also
- *        supports DEBUG_PROCESS and DEBUG_ONLY_THIS_PROCESS.
+ * @param dwCreationFlags 0, CREATE_SUSPENDED, CREATE_NEW_CONSOLE,
+ *        DEBUG_PROCESS or DEBUG_ONLY_THIS_PROCESS. With the debug flags,
+ *        only the calling thread can call WaitForDebugEvent.
  * @param lpEnvironment Must be NULL.
  * @param lpCurrentDirectory Must be NULL.
  * @param lpStartupInfo Must be NULL.

@@ -98,6 +98,11 @@ with FreeContextBuffer.
 @return SEC_E_OK or a continuation status on success; otherwise a
         SEC_E_* error code.
 
+## InitSecurityInterfaceA()
+Returns the ANSI SSPI dispatch table.
+
+@return Pointer to a SecurityFunctionTableA, or NULL on failure.
+
 ## InitSecurityInterfaceW()
 Returns the SSPI dispatch table for calling security services indirectly.
 

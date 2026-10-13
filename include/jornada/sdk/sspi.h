@@ -106,6 +106,11 @@ SECURITY_STATUS FreeCredentialsHandle(PCredHandle phCredential);
 SECURITY_STATUS ImpersonateSecurityContext(PCtxtHandle phContext);
 struct _SECURITY_FUNCTION_TABLE_A;
 typedef struct _SECURITY_FUNCTION_TABLE_A *PSecurityFunctionTableA;
+/**
+ * Returns the ANSI SSPI dispatch table.
+ *
+ * @return Pointer to a SecurityFunctionTableA, or NULL on failure.
+ */
 PSecurityFunctionTableA InitSecurityInterfaceA(void);
 struct _SECURITY_FUNCTION_TABLE_W;
 typedef struct _SECURITY_FUNCTION_TABLE_W *PSecurityFunctionTableW;

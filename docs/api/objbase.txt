@@ -128,6 +128,13 @@ logical length matters. It does not support transactions or locking.
 @param ppstm Receives the IStream interface pointer.
 @return S_OK, E_INVALIDARG or E_OUTOFMEMORY.
 
+## DllCanUnloadNow()
+Implemented by an in-process COM server, which exports it; COM calls it
+to ask whether the DLL can be unloaded.
+
+@return S_OK if no objects or locks are outstanding, S_FALSE if the DLL
+        is still in use.
+
 ## DllGetClassObject(rclsid, riid, ppv)
 DLL entry point implemented by a COM server to expose its class factory.
 

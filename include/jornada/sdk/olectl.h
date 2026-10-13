@@ -9,7 +9,19 @@
 extern "C" {
 #endif
 
+/**
+ * Implemented by a self-registering COM server, which exports it, to add
+ * its classes to the registry.
+ *
+ * @return S_OK on success, or an error HRESULT.
+ */
 HRESULT DllRegisterServer(void);
+/**
+ * Implemented by a self-registering COM server, which exports it, to
+ * remove the registry entries DllRegisterServer added.
+ *
+ * @return S_OK on success, or an error HRESULT.
+ */
 HRESULT DllUnregisterServer(void);
 struct tagFONTDESC;
 typedef struct tagFONTDESC FONTDESC;

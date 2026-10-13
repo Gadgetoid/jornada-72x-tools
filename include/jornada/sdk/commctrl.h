@@ -6,6 +6,12 @@
 extern "C" {
 #endif
 
+/**
+ * Lines up the command bar's adornments, the buttons added with
+ * CommandBar_AddAdornments, after its buttons or size change.
+ *
+ * @param hwndCB The command bar.
+ */
 void CommandBar_AlignAdornments(HWND hwndCB);
 typedef struct _HD_HITTESTINFO HDHITTESTINFO;
 typedef const COMMANDBANDSRESTOREINFO *LPCCOMMANDBANDSRESTOREINFO;

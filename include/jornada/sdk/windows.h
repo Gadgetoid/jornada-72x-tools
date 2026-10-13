@@ -178,6 +178,16 @@ HANDLE CeOpenDatabaseEx(PCEGUID pguid, PCEOID poid, LPWSTR lpszName, CEPROPID pr
  * @return Record object ID, or zero on failure; use GetLastError.
  */
 CEOID CeReadRecordPropsEx(HANDLE hDbase, DWORD dwFlags, LPWORD lpcPropID, CEPROPID *rgPropID, LPBYTE *lplpBuffer, LPDWORD lpcbBuffer, HANDLE hHeap);
+/**
+ * Asks the associated file-system driver to remount a device after media or
+ * a new volume is inserted. This is intended for use by a device driver.
+ *
+ * @param hDevice Handle to a device registered with RegisterDevice.
+ * @return TRUE on success, FALSE on failure.
+ *
+ * This API is part of the complete Windows CE OS package; OEM platform
+ * configurations may not support it.
+ */
 BOOL CeResyncFilesys(HANDLE hDevice);
 /**
  * Changes a database's name, type, sort orders or compression settings.
@@ -215,6 +225,16 @@ BOOL CeUnmountDBVol(PCEGUID pguid);
  * @return TRUE on success, FALSE on failure.
  */
 BOOL LoadFSDEx(HANDLE hDevice, LPCWSTR lpFSDName, DWORD dwFlag);
+/**
+ * Writes a formatted message to the kernel's debug output.
+ *
+ * DEBUGMSG, RETAILMSG and the other dbgapi.h macros call it. Where the
+ * output goes depends on the device: usually a debug serial port or a
+ * kernel debugger.
+ *
+ * @param lpszFmt Wide-character printf-style format string, followed by
+ *        its arguments.
+ */
 void NKDbgPrintfW(LPCWSTR lpszFmt, ...);
 BOOL SHRemoveFontResource(LPCTSTR szFileName);
 /**

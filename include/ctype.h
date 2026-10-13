@@ -17,7 +17,19 @@ extern "C" {
  * @return Nonzero if the character has the property, or 0 otherwise.
  */
 int _isctype(int character, int type);
+/**
+ * Converts a character to lowercase.
+ *
+ * @param character Character to convert, as an unsigned char value or EOF.
+ * @return The lowercase character, or character unchanged if it has none.
+ */
 int tolower(int character);
+/**
+ * Converts a character to uppercase.
+ *
+ * @param character Character to convert, as an unsigned char value or EOF.
+ * @return The uppercase character, or character unchanged if it has none.
+ */
 int toupper(int character);
 int isalnum(int character);
 int isalpha(int character);

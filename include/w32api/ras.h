@@ -806,27 +806,28 @@ DWORD APIENTRY RasDialA (LPRASDIALEXTENSIONS, LPCSTR, LPRASDIALPARAMSA,
 /**
  * Starts a RAS connection.
  *
- * Always asynchronous: returns at once and reports progress to a window.
- * Doesn't prompt for logon details: the application must collect them.
- * Paused states such as RASCS_CallbackSetByCaller are not supported.
+ * With a notifier window it returns at once and reports progress to the
+ * window; with lpvNotifier NULL it blocks until the connection succeeds or
+ * fails. Doesn't prompt for logon details: the application must collect
+ * them. Paused states such as RASCS_CallbackSetByCaller are not supported.
  * Detect later failures with RasGetConnectStatusW.
  *
  * @param lpRasDialExtensions Ignored: must be NULL.
  * @param lpszPhonebook Ignored: must be NULL.
  * @param lpRasDialParams RASDIALPARAMS with dwSize set and the entry,
- *        user name and password. On Windows CE 2.0, set szPhoneNumber and
- *        szCallbackNumber to empty strings.
- * @param dwNotifierType Must be 0xFFFFFFFF: lpvNotifier is a window.
+ *        user name and password. szPhoneNumber and szCallbackNumber are
+ *        unused: set them to empty strings.
+ * @param dwNotifierType 0xFFFFFFFF when lpvNotifier is a window; ignored
+ *        when it is NULL.
  * @param lpvNotifier Window that receives WM_RASDIALEVENT (or the message
  *        registered as RASDIALEVENT) with the RASCONNSTATE in wParam and
- *        an error in lParam. Notifications end on RASCS_Connected, on an
- *        error or on RasHangUpW.
+ *        an error in lParam, or NULL to dial synchronously. Notifications
+ *        end on RASCS_Connected, on an error or on RasHangUpW.
  * @param lphRasConn Receives the connection handle. Set *lphRasConn to
  *        NULL first. If a handle is returned, always call RasHangUpW on
  *        it, even when RasDialW fails.
- * @return 0 if dialling started, or a RAS error or
- *         ERROR_NOT_ENOUGH_MEMORY. ERROR_CANNOT_FIND_PHONEBOOK_ENTRY is
- *         never returned.
+ * @return 0 on success (with a window, 0 if dialling started), or a RAS
+ *         error or ERROR_NOT_ENOUGH_MEMORY.
  */
 DWORD APIENTRY RasDialW (LPRASDIALEXTENSIONS lpRasDialExtensions, LPCWSTR lpszPhonebook, LPRASDIALPARAMSW lpRasDialParams,
     	        DWORD dwNotifierType, LPVOID lpvNotifier, LPHRASCONN lphRasConn);
@@ -884,8 +885,20 @@ DWORD APIENTRY RasHangUpA (HRASCONN);
 DWORD APIENTRY RasHangUpW (HRASCONN hRasConn);
 DWORD APIENTRY RasGetProjectionInfoA (HRASCONN, RASPROJECTION, LPVOID,
  				LPDWORD);
-DWORD APIENTRY RasGetProjectionInfoW (HRASCONN, RASPROJECTION, LPVOID,
-				LPDWORD);
+/**
+ * Retrieves negotiated protocol information for a RAS connection.
+ *
+ * For `RASP_PppIp`, the output is a RASPPPIP structure. On return, `lpcb`
+ * receives the required buffer size. OEM support may vary.
+ *
+ * @param hrasconn Connection handle from RasDial or RasEnumConnections.
+ * @param rasprojection Protocol whose projection information is requested.
+ * @param lpprojection Receives the protocol-specific information.
+ * @param lpcb Input buffer size and output required size, in bytes.
+ * @return Zero on success, or a RAS error code.
+ */
+DWORD APIENTRY RasGetProjectionInfoW (HRASCONN hrasconn, RASPROJECTION rasprojection, LPVOID lpprojection,
+				LPDWORD lpcb);
 DWORD APIENTRY RasCreatePhonebookEntryA (HWND, LPCSTR);
 DWORD APIENTRY RasCreatePhonebookEntryW (HWND, LPCWSTR);
 DWORD APIENTRY RasEditPhonebookEntryA (HWND, LPCSTR, LPCSTR);
@@ -921,7 +934,19 @@ DWORD APIENTRY RasGetEntryDialParamsA (LPCSTR, LPRASDIALPARAMSA, LPBOOL);
  */
 DWORD APIENTRY RasGetEntryDialParamsW (LPCWSTR lpszPhonebook, LPRASDIALPARAMSW lprasdialparams, LPBOOL lpfPassword);
 DWORD APIENTRY RasEnumDevicesA (LPRASDEVINFOA, LPDWORD, LPDWORD);
-DWORD APIENTRY RasEnumDevicesW (LPRASDEVINFOW, LPDWORD, LPDWORD);
+/**
+ * Retrieves the names and types of RAS-capable devices.
+ *
+ * Set `dwSize` in the first RASDEVINFOW structure before calling. On
+ * return, `lpcb` receives the required buffer size in bytes. OEM support
+ * may vary.
+ *
+ * @param lpRasDevinfo Receives an array of RASDEVINFOW structures.
+ * @param lpcb Input buffer size and output required size, in bytes.
+ * @param lpcDevices Receives the number of structures written.
+ * @return Zero on success, or a RAS error code.
+ */
+DWORD APIENTRY RasEnumDevicesW (LPRASDEVINFOW lpRasDevinfo, LPDWORD lpcb, LPDWORD lpcDevices);
 DWORD APIENTRY RasGetCountryInfoA (LPRASCTRYINFOA, LPDWORD);
 DWORD APIENTRY RasGetCountryInfoW (LPRASCTRYINFOW, LPDWORD);
 DWORD APIENTRY RasGetEntryPropertiesA (LPCSTR, LPCSTR, LPRASENTRYA, LPDWORD,
@@ -930,22 +955,20 @@ DWORD APIENTRY RasGetEntryPropertiesA (LPCSTR, LPCSTR, LPRASENTRYA, LPDWORD,
  * Returns the properties of a phone book entry.
  *
  * Pass lpRasEntry as NULL and *lpdwEntryInfoSize as 0 to get the size
- * needed.
+ * needed. The alternate phone number list is not used.
  *
  * @param lpszPhonebook Ignored: must be NULL.
  * @param lpszEntry Entry name, or L"" for default values.
- * @param lpRasEntry RASENTRY with dwSize set, followed by room for any
- *        alternate numbers, or NULL.
+ * @param lpRasEntry RASENTRY with dwSize set, or NULL.
  * @param lpdwEntryInfoSize Size of lpRasEntry in bytes. Receives the size
  *        needed. May be NULL if lpRasEntry is NULL.
- * @param lpbDeviceInfo Receives device configuration on Windows CE 2.0.
- *        On Windows CE 1.0, ignored: must be NULL (use
- *        RasGetEntryDevConfig).
- * @param lpdwDeviceInfoSize Size of lpbDeviceInfo in bytes on Windows CE
- *        2.0. On Windows CE 1.0, must be NULL.
- * @return 0 on success, or ERROR_INVALID_PARAMETER, ERROR_BUFFER_INVALID,
- *         ERROR_BUFFER_TOO_SMALL, ERROR_CANNOT_OPEN_PHONEBOOK or
- *         ERROR_CANNOT_FIND_PHONEBOOK_ENTRY.
+ * @param lpbDeviceInfo Receives the opaque TAPI device configuration (see
+ *        lineGetDevConfig), or NULL.
+ * @param lpdwDeviceInfoSize Size of lpbDeviceInfo in bytes. Receives the
+ *        size needed. May be NULL if lpbDeviceInfo is NULL.
+ * @return 0 on success, or ERROR_INVALID_PARAMETER, ERROR_INVALID_SIZE,
+ *         ERROR_BUFFER_INVALID, ERROR_BUFFER_TOO_SMALL,
+ *         ERROR_CANNOT_OPEN_PHONEBOOK or ERROR_CANNOT_FIND_PHONEBOOK_ENTRY.
  */
 DWORD APIENTRY RasGetEntryPropertiesW (LPCWSTR lpszPhonebook, LPCWSTR lpszEntry, LPRASENTRYW lpRasEntry,
 				 LPDWORD lpdwEntryInfoSize, LPBYTE lpbDeviceInfo, LPDWORD lpdwDeviceInfoSize);
@@ -954,17 +977,16 @@ DWORD APIENTRY RasSetEntryPropertiesA (LPCSTR, LPCSTR, LPRASENTRYA, DWORD,
 /**
  * Changes a phone book entry, or creates it if it doesn't exist.
  *
- * Check new names with RasValidateEntryNameW first.
+ * Check new names with RasValidateEntryNameW first. The alternate phone
+ * number list is not used.
  *
  * @param lpszPhonebook Ignored: must be NULL.
  * @param lpszEntry Entry name.
- * @param lpRasEntry RASENTRY with the new settings, optionally followed
- *        by double-null-terminated alternate numbers at dwAlternateOffset.
+ * @param lpRasEntry RASENTRY with the new settings.
  * @param dwEntryInfoSize Size of lpRasEntry in bytes.
- * @param lpbDeviceInfo Device configuration on Windows CE 2.0. On Windows
- *        CE 1.0, ignored: must be NULL (use RasSetEntryDevConfig).
- * @param dwDeviceInfoSize Size of lpbDeviceInfo in bytes on Windows CE
- *        2.0. On Windows CE 1.0, must be 0.
+ * @param lpbDeviceInfo Opaque TAPI device configuration (see
+ *        lineGetDevConfig), or NULL.
+ * @param dwDeviceInfoSize Size of lpbDeviceInfo in bytes.
  * @return 0 on success, or ERROR_BUFFER_INVALID or
  *         ERROR_CANNOT_OPEN_PHONEBOOK.
  */
@@ -1052,7 +1074,18 @@ typedef DWORD (WINAPI * RasCustomDialFn) (HINSTANCE, LPRASDIALEXTENSIONS,
 				LPCTSTR, LPRASDIALPARAMS, DWORD, LPVOID, LPHRASCONN, DWORD);
 
 DWORD APIENTRY RasInvokeEapUI (HRASCONN, DWORD, LPRASDIALEXTENSIONS, HWND);
-DWORD APIENTRY RasGetLinkStatistics (HRASCONN, DWORD, RAS_STATS*);
+/**
+ * Retrieves statistics for a RAS connection subentry.
+ *
+ * The RAS_STATS structure includes byte and frame counts, error counts,
+ * compression ratios, bits per second and connection duration.
+ *
+ * @param hRasConn RAS connection handle.
+ * @param dwSubEntry Subentry whose statistics to retrieve.
+ * @param lpStatistics Receives the RAS_STATS structure.
+ * @return Zero on success, or a RAS error code.
+ */
+DWORD APIENTRY RasGetLinkStatistics (HRASCONN hRasConn, DWORD dwSubEntry, RAS_STATS*lpStatistics);
 DWORD APIENTRY RasGetConnectionStatistics (HRASCONN, RAS_STATS*);
 DWORD APIENTRY RasClearLinkStatistics (HRASCONN, DWORD);
 DWORD APIENTRY RasClearConnectionStatistics (HRASCONN);
@@ -1076,27 +1109,28 @@ VOID APIENTRY RasFreeEapUserIdentityA (LPRASEAPUSERIDENTITYA);
 /**
  * Starts a RAS connection.
  *
- * Always asynchronous: returns at once and reports progress to a window.
- * Doesn't prompt for logon details: the application must collect them.
- * Paused states such as RASCS_CallbackSetByCaller are not supported.
+ * With a notifier window it returns at once and reports progress to the
+ * window; with lpvNotifier NULL it blocks until the connection succeeds or
+ * fails. Doesn't prompt for logon details: the application must collect
+ * them. Paused states such as RASCS_CallbackSetByCaller are not supported.
  * Detect later failures with RasGetConnectStatusW.
  *
  * @param lpRasDialExtensions Ignored: must be NULL.
  * @param lpszPhonebook Ignored: must be NULL.
  * @param lpRasDialParams RASDIALPARAMS with dwSize set and the entry,
- *        user name and password. On Windows CE 2.0, set szPhoneNumber and
- *        szCallbackNumber to empty strings.
- * @param dwNotifierType Must be 0xFFFFFFFF: lpvNotifier is a window.
+ *        user name and password. szPhoneNumber and szCallbackNumber are
+ *        unused: set them to empty strings.
+ * @param dwNotifierType 0xFFFFFFFF when lpvNotifier is a window; ignored
+ *        when it is NULL.
  * @param lpvNotifier Window that receives WM_RASDIALEVENT (or the message
  *        registered as RASDIALEVENT) with the RASCONNSTATE in wParam and
- *        an error in lParam. Notifications end on RASCS_Connected, on an
- *        error or on RasHangUpW.
+ *        an error in lParam, or NULL to dial synchronously. Notifications
+ *        end on RASCS_Connected, on an error or on RasHangUpW.
  * @param lphRasConn Receives the connection handle. Set *lphRasConn to
  *        NULL first. If a handle is returned, always call RasHangUpW on
  *        it, even when RasDialW fails.
- * @return 0 if dialling started, or a RAS error or
- *         ERROR_NOT_ENOUGH_MEMORY. ERROR_CANNOT_FIND_PHONEBOOK_ENTRY is
- *         never returned.
+ * @return 0 on success (with a window, 0 if dialling started), or a RAS
+ *         error or ERROR_NOT_ENOUGH_MEMORY.
  */
 #define RasDial RasDialW
 /**
@@ -1144,6 +1178,18 @@ VOID APIENTRY RasFreeEapUserIdentityA (LPRASEAPUSERIDENTITYA);
  * @return 0 on success, or a RAS error or ERROR_INVALID_HANDLE.
  */
 #define RasHangUp RasHangUpW
+/**
+ * Retrieves negotiated protocol information for a RAS connection.
+ *
+ * For `RASP_PppIp`, the output is a RASPPPIP structure. On return, `lpcb`
+ * receives the required buffer size. OEM support may vary.
+ *
+ * @param hrasconn Connection handle from RasDial or RasEnumConnections.
+ * @param rasprojection Protocol whose projection information is requested.
+ * @param lpprojection Receives the protocol-specific information.
+ * @param lpcb Input buffer size and output required size, in bytes.
+ * @return Zero on success, or a RAS error code.
+ */
 #define RasGetProjectionInfo RasGetProjectionInfoW
 #define RasCreatePhonebookEntry RasCreatePhonebookEntryW
 #define RasEditPhonebookEntry RasEditPhonebookEntryW
@@ -1175,44 +1221,53 @@ VOID APIENTRY RasFreeEapUserIdentityA (LPRASEAPUSERIDENTITYA);
  *         ERROR_CANNOT_FIND_PHONEBOOK_ENTRY.
  */
 #define RasGetEntryDialParams RasGetEntryDialParamsW
+/**
+ * Retrieves the names and types of RAS-capable devices.
+ *
+ * Set `dwSize` in the first RASDEVINFOW structure before calling. On
+ * return, `lpcb` receives the required buffer size in bytes. OEM support
+ * may vary.
+ *
+ * @param lpRasDevinfo Receives an array of RASDEVINFOW structures.
+ * @param lpcb Input buffer size and output required size, in bytes.
+ * @param lpcDevices Receives the number of structures written.
+ * @return Zero on success, or a RAS error code.
+ */
 #define RasEnumDevices RasEnumDevicesW
 #define RasGetCountryInfo RasGetCountryInfoW
 /**
  * Returns the properties of a phone book entry.
  *
  * Pass lpRasEntry as NULL and *lpdwEntryInfoSize as 0 to get the size
- * needed.
+ * needed. The alternate phone number list is not used.
  *
  * @param lpszPhonebook Ignored: must be NULL.
  * @param lpszEntry Entry name, or L"" for default values.
- * @param lpRasEntry RASENTRY with dwSize set, followed by room for any
- *        alternate numbers, or NULL.
+ * @param lpRasEntry RASENTRY with dwSize set, or NULL.
  * @param lpdwEntryInfoSize Size of lpRasEntry in bytes. Receives the size
  *        needed. May be NULL if lpRasEntry is NULL.
- * @param lpbDeviceInfo Receives device configuration on Windows CE 2.0.
- *        On Windows CE 1.0, ignored: must be NULL (use
- *        RasGetEntryDevConfig).
- * @param lpdwDeviceInfoSize Size of lpbDeviceInfo in bytes on Windows CE
- *        2.0. On Windows CE 1.0, must be NULL.
- * @return 0 on success, or ERROR_INVALID_PARAMETER, ERROR_BUFFER_INVALID,
- *         ERROR_BUFFER_TOO_SMALL, ERROR_CANNOT_OPEN_PHONEBOOK or
- *         ERROR_CANNOT_FIND_PHONEBOOK_ENTRY.
+ * @param lpbDeviceInfo Receives the opaque TAPI device configuration (see
+ *        lineGetDevConfig), or NULL.
+ * @param lpdwDeviceInfoSize Size of lpbDeviceInfo in bytes. Receives the
+ *        size needed. May be NULL if lpbDeviceInfo is NULL.
+ * @return 0 on success, or ERROR_INVALID_PARAMETER, ERROR_INVALID_SIZE,
+ *         ERROR_BUFFER_INVALID, ERROR_BUFFER_TOO_SMALL,
+ *         ERROR_CANNOT_OPEN_PHONEBOOK or ERROR_CANNOT_FIND_PHONEBOOK_ENTRY.
  */
 #define RasGetEntryProperties RasGetEntryPropertiesW
 /**
  * Changes a phone book entry, or creates it if it doesn't exist.
  *
- * Check new names with RasValidateEntryNameW first.
+ * Check new names with RasValidateEntryNameW first. The alternate phone
+ * number list is not used.
  *
  * @param lpszPhonebook Ignored: must be NULL.
  * @param lpszEntry Entry name.
- * @param lpRasEntry RASENTRY with the new settings, optionally followed
- *        by double-null-terminated alternate numbers at dwAlternateOffset.
+ * @param lpRasEntry RASENTRY with the new settings.
  * @param dwEntryInfoSize Size of lpRasEntry in bytes.
- * @param lpbDeviceInfo Device configuration on Windows CE 2.0. On Windows
- *        CE 1.0, ignored: must be NULL (use RasSetEntryDevConfig).
- * @param dwDeviceInfoSize Size of lpbDeviceInfo in bytes on Windows CE
- *        2.0. On Windows CE 1.0, must be 0.
+ * @param lpbDeviceInfo Opaque TAPI device configuration (see
+ *        lineGetDevConfig), or NULL.
+ * @param dwDeviceInfoSize Size of lpbDeviceInfo in bytes.
  * @return 0 on success, or ERROR_BUFFER_INVALID or
  *         ERROR_CANNOT_OPEN_PHONEBOOK.
  */

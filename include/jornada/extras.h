@@ -49,8 +49,8 @@ HANDLE WINAPI GetClipboardDataAlloc(UINT uFormat);
 /**
  * Retrieves the current time as a FILETIME.
  *
- * Undocumented in the Windows CE SDK. The CE 1.0 headers describe it as
- * internal to the file system.
+ * Undocumented. The SDK header marks it as internal to the file system:
+ * prefer GetSystemTime with SystemTimeToFileTime.
  *
  * @param lpFileTime Receives the time.
  */

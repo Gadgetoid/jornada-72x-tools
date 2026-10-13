@@ -324,6 +324,19 @@ int swprintf(wchar_t *buffer, const wchar_t *format, ...);
  * @return Characters written, not counting the terminating null.
  */
 int vswprintf(wchar_t *buffer, const wchar_t *format, va_list arguments);
+/**
+ * Formats wide-character output into a buffer, storing no more than count
+ * characters.
+ *
+ * The terminating null is appended unless count is zero or the formatted
+ * length is at least count. A truncated result returns a negative value.
+ *
+ * @param buffer Receives the formatted output.
+ * @param count Maximum number of wide characters to store.
+ * @param format Wide-character format-control string.
+ * @return Characters stored excluding the null terminator, or a negative
+ *         value if the output does not fit.
+ */
 int _snwprintf(wchar_t *buffer, size_t count, const wchar_t *format, ...);
 /**
  * Formats wide-character output into a buffer using a va_list.

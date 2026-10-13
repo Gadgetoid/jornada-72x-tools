@@ -13,6 +13,14 @@ extern "C" {
 struct IShellFolder;
 typedef struct IShellFolder IShellFolder;
 typedef IShellFolder *LPSHELLFOLDER;
+/**
+ * Retrieves the IShellFolder interface for the desktop namespace root.
+ *
+ * Release the returned interface when it is no longer needed.
+ *
+ * @param ppshf Receives the desktop IShellFolder interface.
+ * @return S_OK on success, or an HRESULT error.
+ */
 HRESULT SHGetDesktopFolder(LPSHELLFOLDER *ppshf);
 /**
  * Retrieves the shell's IMalloc interface.

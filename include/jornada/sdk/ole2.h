@@ -33,6 +33,20 @@ HRESULT CreateOleAdviseHolder(LPOLEADVISEHOLDER *ppOAHolder);
  * @return S_OK, E_INVALIDARG or E_OUTOFMEMORY.
  */
 HRESULT CreateStreamOnHGlobal(HGLOBAL hGlobal, BOOL fDeleteOnRelease, LPSTREAM *ppstm);
+/**
+ * Runs an OLE drag-and-drop operation for a data source.
+ *
+ * Call OleInitialize first. The source supplies IDataObject and IDropSource
+ * implementations; the target window must be registered with
+ * RegisterDragDrop. On drop or cancellation, the return value is
+ * DRAGDROP_S_DROP or DRAGDROP_S_CANCEL.
+ *
+ * @param pDataObj IDataObject containing the dragged data.
+ * @param pDropSource IDropSource implementation for the drag operation.
+ * @param dwOKEffects DROPEFFECT_* operations the source permits.
+ * @param pdwEffect Receives the effect selected by the target.
+ * @return DRAGDROP_S_DROP, DRAGDROP_S_CANCEL or an HRESULT error.
+ */
 HRESULT DoDragDrop(LPDATAOBJECT pDataObj, LPDROPSOURCE pDropSource, DWORD dwOKEffects, LPDWORD pdwEffect);
 /**
  * Retrieves the current global-memory handle backing an HGLOBAL stream.
@@ -147,6 +161,16 @@ HRESULT ReadClassStg(LPSTORAGE pStg, CLSID *pclsid);
  * @return S_OK, or STG_E_READFAULT if the stream ends before the CLSID.
  */
 HRESULT ReadClassStm(LPSTREAM pStm, CLSID *pclsid);
+/**
+ * Registers a window as an OLE drop target.
+ *
+ * Call OleInitialize first. The function holds a reference to
+ * `pDropTarget`; call RevokeDragDrop when the window is no longer a target.
+ *
+ * @param hwnd Window that accepts drops.
+ * @param pDropTarget IDropTarget implementation for the window.
+ * @return S_OK, DRAGDROP_E_INVALIDHWND, DRAGDROP_E_ALREADYREGISTERED or an error.
+ */
 HRESULT RegisterDragDrop(HWND hwnd, LPDROPTARGET pDropTarget);
 /**
  * Releases the resources owned by a storage medium.
@@ -157,6 +181,14 @@ HRESULT RegisterDragDrop(HWND hwnd, LPDROPTARGET pDropTarget);
  * @param pmedium Storage medium to release.
  */
 void ReleaseStgMedium(LPSTGMEDIUM pmedium);
+/**
+ * Removes a window's OLE drop-target registration.
+ *
+ * This releases the IDropTarget reference acquired by RegisterDragDrop.
+ *
+ * @param hwnd Window previously registered as a drop target.
+ * @return S_OK, DRAGDROP_E_NOTREGISTERED, DRAGDROP_E_INVALIDHWND or an error.
+ */
 HRESULT RevokeDragDrop(HWND hwnd);
 /**
  * Writes a CLSID to an IStorage object for later retrieval by ReadClassStg.

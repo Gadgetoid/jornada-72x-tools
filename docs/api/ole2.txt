@@ -6,6 +6,20 @@ The implementation does not support IOleAdviseHolder::EnumAdvise.
 @param ppOAHolder Receives the IOleAdviseHolder interface pointer.
 @return S_OK, or E_OUTOFMEMORY.
 
+## DoDragDrop(pDataObj, pDropSource, dwOKEffects, pdwEffect)
+Runs an OLE drag-and-drop operation for a data source.
+
+Call OleInitialize first. The source supplies IDataObject and IDropSource
+implementations; the target window must be registered with
+RegisterDragDrop. On drop or cancellation, the return value is
+DRAGDROP_S_DROP or DRAGDROP_S_CANCEL.
+
+@param pDataObj IDataObject containing the dragged data.
+@param pDropSource IDropSource implementation for the drag operation.
+@param dwOKEffects DROPEFFECT_* operations the source permits.
+@param pdwEffect Receives the effect selected by the target.
+@return DRAGDROP_S_DROP, DRAGDROP_S_CANCEL or an HRESULT error.
+
 ## OleCreate(rclsid, riid, renderopt, pFormatEtc, pClientSite, pStg, ppvObj)
 Creates and initializes a new embedded OLE object in storage.
 
@@ -99,6 +113,16 @@ Reads a CLSID previously written to an IStream.
 @param pclsid Receives the CLSID.
 @return S_OK, or STG_E_READFAULT if the stream ends before the CLSID.
 
+## RegisterDragDrop(hwnd, pDropTarget)
+Registers a window as an OLE drop target.
+
+Call OleInitialize first. The function holds a reference to
+`pDropTarget`; call RevokeDragDrop when the window is no longer a target.
+
+@param hwnd Window that accepts drops.
+@param pDropTarget IDropTarget implementation for the window.
+@return S_OK, DRAGDROP_E_INVALIDHWND, DRAGDROP_E_ALREADYREGISTERED or an error.
+
 ## ReleaseStgMedium(pmedium)
 Releases the resources owned by a storage medium.
 
@@ -106,6 +130,14 @@ The release action depends on tymed and punkForRelease. The medium is
 invalid after this call.
 
 @param pmedium Storage medium to release.
+
+## RevokeDragDrop(hwnd)
+Removes a window's OLE drop-target registration.
+
+This releases the IDropTarget reference acquired by RegisterDragDrop.
+
+@param hwnd Window previously registered as a drop target.
+@return S_OK, DRAGDROP_E_NOTREGISTERED, DRAGDROP_E_INVALIDHWND or an error.
 
 ## WriteClassStg(pStg, rclsid)
 Writes a CLSID to an IStorage object for later retrieval by ReadClassStg.

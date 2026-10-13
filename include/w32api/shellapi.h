@@ -318,7 +318,17 @@ HINSTANCE WINAPI FindExecutableA(LPCSTR,LPCSTR,LPSTR);
 HINSTANCE WINAPI FindExecutableW(LPCWSTR,LPCWSTR,LPWSTR);
 UINT WINAPI SHAppBarMessage(DWORD,PAPPBARDATA);
 BOOL WINAPI Shell_NotifyIconA(DWORD,PNOTIFYICONDATAA);
-BOOL WINAPI _WNAME(Shell_NotifyIcon)(DWORD,PNOTIFYICONDATAW);
+/**
+ * Adds, modifies or removes an icon in the taskbar status area.
+ *
+ * The message must be NIM_ADD, NIM_MODIFY or NIM_DELETE. OEM support may
+ * vary.
+ *
+ * @param dwMessage Notification-icon operation.
+ * @param pnid NOTIFYICONDATA structure for the operation.
+ * @return Nonzero on success, zero on failure.
+ */
+BOOL WINAPI _WNAME(Shell_NotifyIcon)(DWORD dwMessage,PNOTIFYICONDATAW pnid);
 int WINAPI ShellAboutA(HWND,LPCSTR,LPCSTR,HICON);
 int WINAPI ShellAboutW(HWND,LPCWSTR,LPCWSTR,HICON);
 #ifndef _WIN32_WCE

@@ -18,6 +18,16 @@ Creates a shortcut file pointing at a target path.
 @param szTarget Target path, up to 256 characters.
 @return TRUE on success, FALSE on failure.
 
+## Shell_NotifyIcon(dwMessage, pnid)
+Adds, modifies or removes an icon in the taskbar status area.
+
+The message must be NIM_ADD, NIM_MODIFY or NIM_DELETE. OEM support may
+vary.
+
+@param dwMessage Notification-icon operation.
+@param pnid NOTIFYICONDATA structure for the operation.
+@return Nonzero on success, zero on failure.
+
 ## ShellExecuteEx(lpExecInfo)
 Performs an action on a file, such as launching an application or document.
 

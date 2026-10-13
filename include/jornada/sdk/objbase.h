@@ -150,6 +150,13 @@ typedef IStream *LPSTREAM;
 struct IMoniker;
 typedef struct IMoniker IMoniker;
 typedef IMoniker *LPMONIKER;
+/**
+ * Implemented by an in-process COM server, which exports it; COM calls it
+ * to ask whether the DLL can be unloaded.
+ *
+ * @return S_OK if no objects or locks are outstanding, S_FALSE if the DLL
+ *         is still in use.
+ */
 HRESULT DllCanUnloadNow(void);
 /**
  * DLL entry point implemented by a COM server to expose its class factory.

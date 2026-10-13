@@ -12,7 +12,24 @@ HRESULT ConvertINetMultiByteToUnicode(LPDWORD lpdwMode, DWORD dwEncoding, LPCSTR
 HRESULT ConvertINetString(LPDWORD lpdwMode, DWORD dwSrcEncoding, DWORD dwDstEncoding, LPCSTR lpSrcStr, LPINT lpnSrcSize, LPSTR lpDstStr, LPINT lpnDstSize);
 HRESULT ConvertINetUnicodeToMultiByte(LPDWORD lpdwMode, DWORD dwEncoding, LPCWSTR lpSrcStr, LPINT lpnWideCharCount, LPSTR lpDstStr, LPINT lpnMultiCharCount);
 HRESULT IsConvertINetStringAvailable(DWORD dwSrcEncoding, DWORD dwDstEncoding);
+/**
+ * Converts a locale identifier to an RFC 1766 language tag, such as
+ * "en-us".
+ *
+ * @param Locale The locale.
+ * @param pszRfc1766 Receives the null-terminated tag.
+ * @param nChar Size of pszRfc1766 in characters.
+ * @return S_OK on success, or an error HRESULT.
+ */
 HRESULT LcidToRfc1766W(LCID Locale, LPWSTR pszRfc1766, int nChar);
+/**
+ * Converts an RFC 1766 language tag, such as "en-us", to a locale
+ * identifier.
+ *
+ * @param pLocale Receives the locale.
+ * @param pszRfc1766 The tag.
+ * @return S_OK on success, or an error HRESULT.
+ */
 HRESULT Rfc1766ToLcidW(LCID *pLocale, LPCWSTR pszRfc1766);
 typedef struct {
 
