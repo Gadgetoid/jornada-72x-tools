@@ -5,6 +5,7 @@ include(JornadaCE)
 
 add_subdirectory(hello)
 add_subdirectory(window)
+add_subdirectory(dialog)
 add_subdirectory(maths)
 add_subdirectory(dll)
 add_subdirectory(cxx-basics)
