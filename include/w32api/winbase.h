@@ -2093,7 +2093,17 @@ WINBASEAPI BOOL WINAPI FreeEnvironmentStringsW(LPWSTR);
  * @return TRUE on success, FALSE on failure (see GetLastError).
  */
 WINBASEAPI BOOL WINAPI FreeLibrary(HMODULE hLibModule);
-DECLSPEC_NORETURN WINBASEAPI void WINAPI FreeLibraryAndExitThread(HMODULE,DWORD);
+/**
+ * Releases a DLL as FreeLibrary does, then ends the calling thread as
+ * ExitThread does.
+ *
+ * Use it from a thread running code inside the DLL: calling FreeLibrary
+ * then ExitThread there would return into an unloaded DLL.
+ *
+ * @param hLibModule The DLL, from LoadLibrary.
+ * @param dwExitCode Exit code for the thread.
+ */
+DECLSPEC_NORETURN WINBASEAPI void WINAPI FreeLibraryAndExitThread(HMODULE hLibModule,DWORD dwExitCode);
 #define FreeModule(m) FreeLibrary(m)
 #define FreeProcInstance(p) (void)(p)
 #ifndef XFree86Server

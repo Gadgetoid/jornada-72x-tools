@@ -645,6 +645,16 @@ Call once for each LoadLibrary.
 @param hLibModule Module handle from LoadLibrary.
 @return TRUE on success, FALSE on failure (see GetLastError).
 
+## FreeLibraryAndExitThread(hLibModule, dwExitCode)
+Releases a DLL as FreeLibrary does, then ends the calling thread as
+ExitThread does.
+
+Use it from a thread running code inside the DLL: calling FreeLibrary
+then ExitThread there would return into an unloaded DLL.
+
+@param hLibModule The DLL, from LoadLibrary.
+@param dwExitCode Exit code for the thread.
+
 ## GetCommandLineW()
 Returns the current process's Unicode command-line string.
 
