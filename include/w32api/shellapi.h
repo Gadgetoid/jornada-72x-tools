@@ -422,7 +422,11 @@ HBITMAP WINAPI SHLoadDIBitmap(LPCTSTR szFileName);
  * The output buffer must hold at least MAX_PATH characters. Virtual
  * folders are not supported. A nonzero fCreate requests creation of the
  * folder if it does not exist. The SDK reference says this function
- * returns FALSE even when successful.
+ * returns FALSE even when successful. On the Jornada 720 it leaves the
+ * buffer empty for CSIDL_DESKTOPDIRECTORY and CSIDL_PROGRAMS: read the
+ * Desktop and Programs values under
+ * HKEY_LOCAL_MACHINE\System\Explorer\Shell Folders instead. The CSIDL_*
+ * values are in shlobj.h.
  *
  * @param hwndOwner Owner window for any dialog or message box.
  * @param lpszPath Receives the folder path.

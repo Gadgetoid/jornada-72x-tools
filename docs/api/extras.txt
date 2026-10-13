@@ -222,6 +222,26 @@ Undocumented in the Windows CE SDK.
 @param dw The sequence number passed to the application on its command
        line.
 
+## VirtualCopy(lpvDest, lpvSrc, cbSize, fdwProtect)
+Maps existing pages, virtual or physical, into a reserved region of the
+calling process, without copying them.
+
+A kernel function for drivers, not in the SDK headers. Reserve the
+destination first with VirtualAlloc(MEM_RESERVE, PAGE_NOACCESS); the
+pages then alias the source. Unmap them with VirtualFree(MEM_DECOMMIT)
+or by releasing the region. Mapping a view of a pagefile-backed shared
+mapping into the calling process works on the Jornada 720.
+
+@param lpvDest Page-aligned address inside the reserved region.
+@param lpvSrc Page-aligned virtual address of the source, or with
+       PAGE_PHYSICAL in fdwProtect, a physical address shifted right
+       by 8.
+@param cbSize Bytes to map, a multiple of the page size.
+@param fdwProtect PAGE_* protection for the new mapping, such as
+       PAGE_READWRITE or PAGE_EXECUTE_READ, optionally with
+       PAGE_NOCACHE, and PAGE_PHYSICAL for a physical source.
+@return TRUE on success, FALSE on failure (see GetLastError).
+
 ## TransparentImage(hdcDest, nXDest, nYDest, nWidthDest, nHeightDest, hImgSrc, nXSrc, nYSrc, nWidthSrc, nHeightSrc, crTransparentColor)
 Copies a bitmap, stretching it as needed, leaving out pixels of a given
 colour.
