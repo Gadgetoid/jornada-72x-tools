@@ -7,7 +7,9 @@ JORNADA_REFERENCE ?= $(CURDIR)/reference/sdk
 export JORNADA_REFERENCE
 EXPORT_DLLS = addrstor asform ceshell commctrl commdlg coredll cxport htmlview imgdecmp inkx mlang mqoa msgstore msmqrt mshtml ndis ole32 oleaut32 richink secur32 shdocvw tnefutil toolhelp urlmon webview wininet winscard winsock
 
-.PHONY: examples debugmgr check-debugmgr exports headers docstrings check-abi check-headers check-cxx-headers check-stdlib clean
+.PHONY: check examples debugmgr check-debugmgr exports headers docstrings check-abi check-headers check-cxx-headers check-stdlib clean
+
+check: check-abi check-cxx-headers check-stdlib check-debugmgr examples debugmgr
 
 examples:
 	cmake -S examples -B build/ce3 -DCMAKE_TOOLCHAIN_FILE=$(TOOLCHAIN)

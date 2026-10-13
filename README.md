@@ -94,6 +94,7 @@ For VS Code, copy `vscode/launch.json`, `vscode/tasks.json` and `vscode/settings
 
 ## Make
 
+- `make check`: run every check that doesn't need the SDK, and build the examples and debugmgr
 - `make examples`: build `examples/` into `build/ce3`
 - `make check-abi`: check the compiler follows Microsoft's Windows CE ARM calling standard
 - `make check-cxx-headers`: check the headers compile as C++
