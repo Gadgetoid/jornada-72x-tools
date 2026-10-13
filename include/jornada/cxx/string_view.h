@@ -20,6 +20,13 @@ public:
 
     constexpr basic_string_view(const Character *text) : text(text), length(measure(text)) {}
 
+    template <typename Text>
+        requires requires(const Text &source) {
+            { source.data() } -> convertible_to<const Character *>;
+            { source.size() } -> convertible_to<size_t>;
+        }
+    constexpr basic_string_view(const Text &source) : text(source.data()), length(source.size()) {}
+
     constexpr const Character *data() const {
         return text;
     }

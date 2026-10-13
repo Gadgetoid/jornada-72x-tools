@@ -14,7 +14,7 @@ A header-only C++20 layer over the Windows CE API, in namespace `jornada`. It ne
 | `handle.h` | `unique_resource<T, Traits>`, `unique_handle` (`CloseHandle`), `create_file`, `create_event` |
 | `memory.h` | `local_ptr<T>` (`LocalFree`), `local_alloc<T>(count)` |
 | `gdi.h` | `unique_pen`, `unique_brush`, `unique_font`, `unique_bitmap`, `unique_region` (`DeleteObject`) and their `create_` functions, `select_guard`, `device_context`, `paint_dc` (`BeginPaint`/`EndPaint`), `window_dc` (`GetDC`/`ReleaseDC`), `point` |
-| `string_view.h` | `wstring_view`, `string_view` |
+| `string_view.h` | `wstring_view`, `string_view`: from a pointer, or anything with `data()` and `size()` (`std::wstring`, `std::wstring_view`, `jornada::wstring<N>`). They don't own the text, so don't keep one past its source. |
 | `fixed_string.h` | `wstring<N>`, `string<N>`: up to N - 1 characters inline, always null-terminated |
 | `utf8.h` | `utf8_to_utf16`, `utf16_to_utf8`, `to_wstring<N>`, `to_utf8<N>` |
 | `format.h` | `format<N>` and `format_to`, over coredll's `_snwprintf` |

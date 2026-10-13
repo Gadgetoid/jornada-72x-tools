@@ -9,6 +9,35 @@
 #include <jornada/cxx/utf8.h>
 #include <jornada/cxx/window.h>
 
+#if __has_include(<__config_site>)
+#include <string>
+#include <string_view>
+
+int standard_text_width(HDC context, const std::wstring &owned, std::wstring_view borrowed) {
+    jornada::device_context dc(context);
+    dc.text_out({0, 0}, owned);
+    dc.text_out({0, 0}, borrowed);
+    jornada::wstring<32> copied(owned);
+    return static_cast<int>(copied.size() + jornada::wstring_view(borrowed).size());
+}
+#endif
+
+struct counted_text {
+    const wchar_t *characters;
+    size_t count;
+
+    constexpr const wchar_t *data() const {
+        return characters;
+    }
+
+    constexpr size_t size() const {
+        return count;
+    }
+};
+
+static_assert(jornada::wstring_view(counted_text{L"counted", 5}) == jornada::wstring_view(L"count"));
+static_assert(jornada::wstring_view(jornada::wstring<8>(L"abc")).size() == 3);
+
 RECT main_window_area() {
     return jornada::work_area_rect();
 }

@@ -61,10 +61,6 @@ public:
         return view_type(characters, length);
     }
 
-    constexpr operator view_type() const {
-        return view();
-    }
-
     constexpr const Character *begin() const {
         return characters;
     }
