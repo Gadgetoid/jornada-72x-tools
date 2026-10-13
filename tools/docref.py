@@ -136,7 +136,7 @@ def lookup(data, name):
 def declarations(clang):
     headers = [os.path.basename(path) for path in sorted(glob.glob(os.path.join(ROOT, "include", "*.h"))) if os.path.basename(path) != "mswsock.h"]
     source = "#include <windows.h>\n#include <winsock.h>\n" + "".join("#include <%s>\n" % header for header in headers)
-    command = [clang, "--target=armv4-unknown-none-wince", "-fshort-wchar", "-ffreestanding", "-fsyntax-only", "-w", "-D_WIN32_WCE=300",
+    command = [clang, "--target=armv4-unknown-none-wince", "-fshort-wchar", "-ffreestanding", "-nostdlibinc", "-fsyntax-only", "-w", "-D_WIN32_WCE=300",
                "-I", os.path.join(ROOT, "include"), "-I", os.path.join(ROOT, "include", "w32api"), "-Xclang", "-ast-dump=json", "-x", "c", "-"]
     tree = json.loads(subprocess.run(command, input=source, capture_output=True, text=True, check=True).stdout)
     found = {}

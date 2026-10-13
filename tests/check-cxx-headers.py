@@ -6,7 +6,7 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-COMMON_FLAGS = ["-fshort-wchar", "-ffreestanding", "-std=c++20", "-fno-exceptions", "-fno-rtti", "-x", "c++"]
+COMMON_FLAGS = ["-fshort-wchar", "-ffreestanding", "-nostdlibinc", "-std=c++20", "-fno-exceptions", "-fno-rtti", "-x", "c++"]
 ARCHITECTURES = {
     "arm": {"target": ["--target=armv4-unknown-none-wince", "-mcpu=strongarm", "-marm", "-mfloat-abi=soft"], "defines": ["-DARM", "-D_ARM_", "-DARMV4"]},
 }

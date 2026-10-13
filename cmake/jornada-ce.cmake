@@ -35,7 +35,7 @@ set(CMAKE_ASM_COMPILER_TARGET ${JORNADA_TARGET})
 set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES JORNADA_LLVM_ROOT)
 
-set(CMAKE_C_FLAGS_INIT "${JORNADA_TARGET_FLAGS} -fshort-wchar -ffreestanding -ffunction-sections -fdata-sections -D_WIN32_WCE=${JORNADA_WIN32_WCE}")
+set(CMAKE_C_FLAGS_INIT "${JORNADA_TARGET_FLAGS} -fshort-wchar -ffreestanding -nostdlibinc -ffunction-sections -fdata-sections -D_WIN32_WCE=${JORNADA_WIN32_WCE}")
 foreach(define IN LISTS JORNADA_ARCH_DEFINES)
     string(APPEND CMAKE_C_FLAGS_INIT " -D${define}")
 endforeach()

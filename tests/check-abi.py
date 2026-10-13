@@ -11,7 +11,7 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FLAGS = ["--target=armv4-unknown-none-wince", "-mcpu=strongarm", "-marm", "-ffreestanding", "-fno-unwind-tables", "-O2"]
+FLAGS = ["--target=armv4-unknown-none-wince", "-mcpu=strongarm", "-marm", "-ffreestanding", "-nostdlibinc", "-fno-unwind-tables", "-O2"]
 
 SOURCE = r"""
 struct S1 { char c; };

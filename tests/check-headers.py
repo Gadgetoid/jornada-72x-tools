@@ -13,7 +13,7 @@ HEADERS = ["windows.h", "commctrl.h", "commdlg.h", "winsock.h", "notify.h", "tlh
            "ole2.h", "oleauto.h", "olectl.h", "msgstore.h", "addrstor.h", "imgdecmp.h", "inkx.h", "richink.h", "mlang.h", "htmlctrl.h", "tnefapi.h", "urlmon.h", "winscard.h", "mshtml.h"]
 WIN32_WCE = {3: 300}
 VERSION_NAMES = {3: "3.0"}
-COMMON_FLAGS = ["-fshort-wchar", "-ffreestanding", "-w", "-ferror-limit=0"]
+COMMON_FLAGS = ["-fshort-wchar", "-ffreestanding", "-nostdlibinc", "-w", "-ferror-limit=0"]
 ARCHITECTURES = {
     "arm": {"target": ["--target=armv4-unknown-none-wince", "-mcpu=strongarm", "-marm", "-mfloat-abi=soft"],
             "sdk_defines": ["-DARM", "-D_ARM_", "-DARMV4", "-D_M_ARM=4", "-D_INTEGRAL_MAX_BITS=64"], "defines": ["-DARM", "-D_ARM_", "-DARMV4"], "exports": "ce%d"},

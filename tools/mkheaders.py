@@ -57,7 +57,7 @@ def write_wrappers():
 
 def declarations(clang, version, arch="arm"):
     source = "#include <windows.h>\n#include <winsock.h>\n#include <tchar.h>\n" + "".join("#include <%s>\n" % header for header in vendored())
-    command = [clang, "--target=armv4-unknown-none-wince", "-mcpu=strongarm", "-marm", "-mfloat-abi=soft", "-fshort-wchar", "-ffreestanding",
+    command = [clang, "--target=armv4-unknown-none-wince", "-mcpu=strongarm", "-marm", "-mfloat-abi=soft", "-fshort-wchar", "-ffreestanding", "-nostdlibinc",
                "-fsyntax-only", "-Xclang", "-ast-dump=json", "-D_WIN32_WCE=%d" % WIN32_WCE[version],
                "-DJORNADA_ALL_DECLARATIONS", "-DJORNADA_NO_CONSTANTS"] + ARCHITECTURES[arch]["defines"] + ["-I", os.path.join(ROOT, "include"), "-I", os.path.join(ROOT, "include", "w32api"), "-x", "c", "-"]
     tree = json.loads(subprocess.run(command, input=source, capture_output=True, text=True, check=True).stdout)

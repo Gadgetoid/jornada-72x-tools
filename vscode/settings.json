@@ -8,6 +8,7 @@
         "-marm",
         "-fshort-wchar",
         "-ffreestanding",
+        "-nostdlibinc",
         "-nostdinc++"
     ],
     "C_Cpp.default.includePath": [
