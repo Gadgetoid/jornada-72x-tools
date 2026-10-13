@@ -51,7 +51,7 @@ In an emulator, debugmgr can use the emulator's host mailbox instead of TCP: sta
 
 It also has `get`, `ls`, `rm`, `mkdir`, `rmdir`, `mv`, `quit` and `handover`. `kill` ends any process, not just ones debugmgr started. Anything that can reach the port can copy files to the device and run programs, so only leave it running on a network you trust. The protocol is in `debugmgr/PROTOCOL.md`.
 
-## Connecting a device over USB
+## Connecting a device
 
 A Jornada 720's dock has a USB sync port, which Linux's `ipaq` driver turns into a serial port. macOS has no driver for it. `bridge/` sets up a Linux machine, such as a Raspberry Pi, to answer PC Link when the device is plugged in, giving it an address with PPP:
 
@@ -62,7 +62,12 @@ sudo bridge/install.sh
 
 A udev rule starts `jornada-link@ttyUSB0` when the dock connects and stops it when it's unplugged. It answers the device's `CLIENT` greeting and runs `pppd`, with the host at 192.168.131.102 and the device at 192.168.131.201. `jornada-desktop` answers PC Link's desktop connection, without which it gives up with "Communications Error". Set `JORNADA_HOST_ADDRESS` and `JORNADA_DEVICE_ADDRESS` in `/etc/default/jornada-bridge` to change the addresses.
 
-Start PC Link on the device with the USB connection.
+Start PC Link on the device with the USB connection. Nothing is routed between the link and other networks; from another computer, tunnel through the bridge's host:
+
+```sh
+ssh -N -L 2100:192.168.131.201:2100 pi
+tools/jornada-debug --device 127.0.0.1:2100 ping
+```
 
 On macOS, a serial cable works instead, through `/usr/sbin/pppd`, which needs root. PC Link only starts once DTR is raised, which `pppd` does:
 
@@ -72,13 +77,7 @@ sudo pppd /dev/cu.usbserial-10 57600 nodetach noauth local nocrtscts nodefaultro
     connect "$(which python3) $PWD/bridge/jornada-handshake" 192.168.131.102:192.168.131.201
 ```
 
-Then start PC Link on the device within 20 seconds.
- Nothing is routed between the link and other networks; from another computer, tunnel through the bridge's host:
-
-```sh
-ssh -N -L 2100:192.168.131.201:2100 pi
-tools/jornada-debug --device 127.0.0.1:2100 ping
-```
+Use the speed PC Link is set to on the device (57600 or 115200), then start PC Link within 20 seconds.
 
 ## GDB and VS Code
 
@@ -101,12 +100,13 @@ For VS Code, copy `vscode/launch.json`, `vscode/tasks.json` and `vscode/settings
 - `make check-stdlib`: build and link a program using most of the standard library
 - `make debugmgr`: build `debugmgr.exe`
 - `make check-debugmgr`: test debugmgr's protocol and `jornada-debug`, with debugmgr built for this computer serving a folder
-- `make headers`, `make check-headers`: regenerate and check the headers against the SDK (needs `reference/sdk`, not included)
+- `make headers`, `make check-headers`: regenerate and check the headers against the SDK (needs `reference/`, not included: see `docs/REFERENCE.md`)
+- `make docstrings`: copy `docs/api` into the headers' doc comments (see `docs/DOCSTRINGS.md`)
 - `make exports ROM=jornada720.bin`: rewrite the export lists from a ROM image
 
 ## Status
 
-Builds and checks pass. debugmgr and GDB debugging work in jornada-72x-emu. Programs run on a Jornada 720 through debugmgr over the USB bridge.
+Builds and checks pass. debugmgr and GDB debugging work in jornada-72x-emu. Programs run on a Jornada 720 through debugmgr, over the USB bridge or a serial cable. There's no GDB on the device yet.
 
 ## Licence
 
