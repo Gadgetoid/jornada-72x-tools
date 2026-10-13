@@ -1,0 +1,73 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  toolchain:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            llvm: linux-x86_64
+          - runner: macos-latest
+            llvm: macos-arm64
+    runs-on: ${{ matrix.runner }}
+    env:
+      JORNADA_LLVM_RELEASE: v3
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install CMake
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake
+
+      - name: Download the Windows CE LLVM
+        run: |
+          name=velo-llvm-$JORNADA_LLVM_RELEASE-${{ matrix.llvm }}
+          url=https://github.com/Gadgetoid/velo-llvm-builds/releases/download/$JORNADA_LLVM_RELEASE
+          curl -fsSLO $url/$name.tar.xz
+          curl -fsSLO $url/$name.tar.xz.sha256
+          shasum -a 256 -c $name.tar.xz.sha256
+          tar xf $name.tar.xz -C "$RUNNER_TEMP"
+          echo "JORNADA_LLVM_ROOT=$RUNNER_TEMP/$name" >> "$GITHUB_ENV"
+
+      - name: Check the docstrings are applied
+        run: |
+          python3 tools/mkdocs.py
+          git diff --exit-code -- include
+
+      - name: Run the checks and build the examples and debugmgr, with no warnings
+        run: |
+          make check 2>&1 | tee build.log
+          ! grep -i "warning:" build.log
+
+      - uses: actions/upload-artifact@v7
+        if: runner.os == 'Linux'
+        with:
+          name: examples
+          path: |
+            build/ce3/**/*.exe
+            build/ce3/**/*.dll
+            build/debugmgr/debugmgr.exe
+
+  rc-grammar:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: vscode/rc-language
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+
+      - name: Test the resource script grammar
+        run: |
+          npm ci
+          npm test
