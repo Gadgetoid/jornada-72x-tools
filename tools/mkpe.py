@@ -126,7 +126,7 @@ def import_runs(symbols):
             markers[value] = name[len(IMPORT_MARKER):].split("$")[0]
     slots = sorted((value, name[len(IMPORT_PREFIX):]) for name, value in symbols.items() if name.startswith(IMPORT_PREFIX))
     if not slots:
-        raise ValueError("no imports")
+        raise ValueError("the program imports nothing from any DLL; call at least one function from coredll or another DLL")
     runs = []
     for index, (value, name) in enumerate(slots):
         if value != slots[0][0] + 4 * index:
