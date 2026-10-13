@@ -232,10 +232,12 @@ pages then alias the source. Unmap them with VirtualFree(MEM_DECOMMIT)
 or by releasing the region. Mapping a view of a pagefile-backed shared
 mapping into the calling process works on the Jornada 720.
 
-@param lpvDest Page-aligned address inside the reserved region.
-@param lpvSrc Page-aligned virtual address of the source, or with
-       PAGE_PHYSICAL in fdwProtect, a physical address shifted right
-       by 8.
+@param lpvDest Page-aligned address inside the reserved region. For a
+       virtual source it must sit at the same offset within a 64 KB
+       block as lpvSrc, or the call fails with ERROR_INVALID_PARAMETER.
+@param lpvSrc Page-aligned virtual address of the source, at the same
+       offset within a 64 KB block as lpvDest, or with PAGE_PHYSICAL in
+       fdwProtect, a physical address shifted right by 8.
 @param cbSize Bytes to map, a multiple of the page size.
 @param fdwProtect PAGE_* protection for the new mapping, such as
        PAGE_READWRITE or PAGE_EXECUTE_READ, optionally with
