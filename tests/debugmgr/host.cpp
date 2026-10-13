@@ -24,6 +24,7 @@ constexpr uint32_t error_already_exists = 183;
 constexpr uint32_t file_attribute_directory = 0x10;
 constexpr uint32_t file_attribute_normal = 0x80;
 constexpr uint32_t first_process = 0x1000;
+constexpr const char *last_arguments_name = "last-arguments.txt";
 
 std::string utf8(const std::u16string &text) {
     std::string result;
@@ -109,10 +110,16 @@ public:
         return debugmgr::status_ok;
     }
 
-    uint32_t run(const std::u16string &program, const std::u16string &, uint32_t &process) override {
+    uint32_t run(const std::u16string &program, const std::u16string &arguments, uint32_t &process) override {
         std::filesystem::path local = map(program);
         if (!std::filesystem::is_regular_file(local)) {
             return windows_error(ENOENT, local);
+        }
+        FILE *record = fopen((root / last_arguments_name).c_str(), "wb");
+        if (record) {
+            std::string text = utf8(arguments);
+            fwrite(text.data(), 1, text.size(), record);
+            fclose(record);
         }
         process = next_process++;
         running.insert(process);

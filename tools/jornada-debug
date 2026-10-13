@@ -35,6 +35,10 @@ class AgentError(Exception):
     pass
 
 
+def command_line(arguments):
+    return " ".join('"%s"' % argument if (" " in argument or "\t" in argument) and '"' not in argument else argument for argument in arguments)
+
+
 def ce_path(path):
     path = path.replace("/", "\\")
     return path if path.startswith("\\") else "\\" + path
@@ -196,7 +200,7 @@ if __name__ == "__main__":
         elif arguments.command == "get":
             print("%d bytes" % agent.get(arguments.remote, arguments.local))
         elif arguments.command == "run":
-            print("0x%08x" % agent.run(arguments.program, " ".join(arguments.arguments)))
+            print("0x%08x" % agent.run(arguments.program, command_line(arguments.arguments)))
         elif arguments.command == "kill":
             agent.kill(arguments.process)
         elif arguments.command == "ls":
@@ -213,6 +217,6 @@ if __name__ == "__main__":
         elif arguments.command == "quit":
             agent.request(COMMAND_QUIT)
         elif arguments.command == "handover":
-            print("0x%08x" % agent.handover(arguments.program, " ".join(arguments.arguments)))
+            print("0x%08x" % agent.handover(arguments.program, command_line(arguments.arguments)))
     except (OSError, AgentError) as error:
         sys.exit("jornada-debug: %s" % error)

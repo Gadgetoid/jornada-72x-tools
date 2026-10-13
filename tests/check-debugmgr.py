@@ -105,8 +105,11 @@ def run(checker, port, sandbox, work):
     output = checker.tool("get", "/Missing/payload.bin", fetched, expect_failure=True)
     checker.expect("path not found" in output, "get from a missing folder: %r" % output)
 
-    output = checker.tool("run", "/Windows/moved.bin", "-x")
+    output = checker.tool("run", "/Windows/moved.bin", "-x", "\\Storage Card\\script.py")
     checker.expect(output.strip() == "0x00001000", "run: %r" % output)
+    recorded = open(os.path.join(sandbox, "last-arguments.txt")).read()
+    checker.expect(recorded == '-x "\\Storage Card\\script.py"', "run arguments: %r" % recorded)
+    os.remove(os.path.join(sandbox, "last-arguments.txt"))
     checker.tool("kill", "0x1000")
     output = checker.tool("kill", "0x1000", expect_failure=True)
     checker.expect("no such process" in output, "kill of an ended process: %r" % output)
