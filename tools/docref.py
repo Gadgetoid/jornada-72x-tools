@@ -309,7 +309,7 @@ def main():
     parser = argparse.ArgumentParser(description="Prepare docstring work from the Windows CE 3.0 reference help files")
     parser.add_argument("command", choices=["index", "batches", "status", "merge"])
     parser.add_argument("--reference", default=os.environ.get("JORNADA_DOCS_REFERENCE", DEFAULT_REFERENCE))
-    parser.add_argument("--clang", default=os.path.join(os.environ.get("JORNADA_LLVM_ROOT", ""), "bin", "clang") if os.environ.get("JORNADA_LLVM_ROOT") else "clang")
+    parser.add_argument("--clang", default=os.path.join(os.environ.get("JORNADA_LLVM_ROOT", os.path.join(ROOT, "llvm")), "bin", "clang"))
     arguments = parser.parse_args()
     if arguments.command == "index":
         index(arguments.reference)
